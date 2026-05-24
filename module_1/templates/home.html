@@ -1,17 +1,49 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Hongkang Zhang - Personal Website</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-    <h1>Hongkang Zhang</h1>
+    <div class="navbar">
+        <a href="/">About</a>
+        <a href="/projects">Projects</a>
+        <a href="/contact">Contact</a>
+    </div>
 
-    <p>
-        Welcome to my personal developer website.
-    </p>
+    <div class="content">
+
+        <div class="text-section">
+
+            <h1>Hongkang Zhang</h1>
+
+            <h2>
+                VP, Pain Therapeutics Research, Quiver Bioscience
+            </h2>
+
+            <p>
+                Drug discovery leader with extensive experience developing next-generation therapeutics for chronic pain, including antisense oligonucleotides (ASOs) and small molecules. My work integrates ion channel biology, RNA therapeutics, and AI-enabled discovery approaches to develop non-opioid treatments for neurological disorders.
+            </p>
+
+            <p>
+                This website was built using Flask, HTML, and CSS.
+            </p>
+
+        </div>
+
+        <div class="image-section">
+
+            <img src="{{ url_for('static', filename='profile.jpg') }}"
+                 alt="Profile Picture">
+
+        </div>
+
+    </div>
 
 </body>
 </html>
