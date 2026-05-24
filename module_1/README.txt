@@ -17,6 +17,8 @@ Requirements:
 - Python 3.10+
 - Flask
 
+Final version submitted for Module 1.
+
 Instructions to Run:
 
 1. Open terminal in the module_1 folder
