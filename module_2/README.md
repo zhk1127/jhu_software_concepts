@@ -419,6 +419,123 @@ A practical production workflow would likely:
 3. Apply the LLM only when necessary.
 
 ---
+---
+
+
+
+# Reproducing the Pipeline
+
+## Environment Setup
+
+Install the required Python packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+For the LLM component, a separate Python 3.11 virtual environment was used because `llama-cpp-python` was not compatible with the Python 3.14 environment used during development.
+
+---
+
+## Step 1: Run the Scraper
+
+Generate the raw applicant dataset:
+
+```bash
+python scrape.py
+```
+
+Output:
+
+```text
+applicant_data.json
+```
+
+The scraper includes:
+
+- Pagination support
+- Retry logic for temporary HTTP failures
+- Resume functionality after interruption
+- Delays between requests to comply with robots.txt guidance
+
+If an existing `applicant_data.json` file is present, the scraper will automatically resume from the last successfully collected page.
+
+---
+
+## Step 2: Run Data Cleaning
+
+Generate the cleaned dataset:
+
+```bash
+python clean.py
+```
+
+Outputs:
+
+```text
+cleaned_applicant_data.json
+cleaning_log.txt
+```
+
+This step performs:
+
+- Text normalization
+- Missing value handling
+- GPA extraction using regular expressions
+- Preparation of records for LLM standardization
+
+---
+
+## Step 3: Run Local LLM Standardization
+
+Navigate to the LLM directory:
+
+```bash
+cd llm_hosting
+```
+
+Run the standardization pipeline:
+
+```bash
+python app.py --file ..\cleaned_applicant_data.json --stdout > ..\llm_extend_applicant_data.jsonl
+```
+
+Output:
+
+```text
+llm_extend_applicant_data.jsonl
+```
+
+This project uses:
+
+```text
+TinyLlama 1.1B Chat
+GGUF format
+llama-cpp-python
+```
+
+Due to computational cost, only the first 1,000 records were processed through the LLM for demonstration purposes. Processing the full 35,000-record dataset would require approximately 17–18 hours on the development machine.
+
+---
+
+## Files Included in Submission
+
+| File | Purpose |
+|--------|--------|
+| scrape.py | Web scraping pipeline |
+| clean.py | Data cleaning pipeline |
+| applicant_data.json | Raw scraped dataset (35,000 records) |
+| cleaned_applicant_data.json | Cleaned dataset |
+| cleaning_log.txt | Cleaning summary and examples |
+| llm_extend_applicant_data.jsonl | LLM standardization output |
+| llm_hosting/app.py | TinyLlama standardization script |
+| requirements.txt | Python dependencies |
+| README.md | Project documentation |
+| screenshot.jpg | robots.txt compliance evidence |
+
+---
+
+
 
 # Conclusion
 
