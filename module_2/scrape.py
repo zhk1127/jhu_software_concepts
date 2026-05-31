@@ -11,8 +11,10 @@ BASE_URL = "https://www.thegradcafe.com/survey"
 RESULT_BASE_URL = "https://www.thegradcafe.com/result/"
 OUTPUT_FILE = "applicant_data.json"
 
-TARGET_RECORDS = 1000
+TARGET_RECORDS = 35000
 DELAY_SECONDS = 1.0
+MAX_RETRIES = 3
+RETRY_WAIT_SECONDS = 10
 
 http = urllib3.PoolManager()
 
@@ -40,6 +42,21 @@ def fetch_page(page=1):
         raise RuntimeError(f"Request failed with status {response.status}: {url}")
 
     return response.data.decode("utf-8", errors="replace")
+
+
+def fetch_page_with_retries(page=1):
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            return fetch_page(page)
+        except Exception as e:
+            print(f"Page {page} failed attempt {attempt}/{MAX_RETRIES}: {e}")
+
+            if attempt < MAX_RETRIES:
+                print(f"Waiting {RETRY_WAIT_SECONDS} seconds before retry...")
+                time.sleep(RETRY_WAIT_SECONDS)
+
+    print(f"Skipping page {page} after {MAX_RETRIES} failed attempts.")
+    return None
 
 
 def extract_results_from_html(html_text):
@@ -85,15 +102,55 @@ def clean_record(record):
     }
 
 
+def save_data(data, filename=OUTPUT_FILE):
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def load_data(filename=OUTPUT_FILE):
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+
+def _deduplicate_by_url(records):
+    seen = set()
+    unique_records = []
+
+    for record in records:
+        url = record.get("url")
+
+        if url in seen:
+            continue
+
+        seen.add(url)
+        unique_records.append(record)
+
+    return unique_records
+
+
 def scrape_data(target_records=TARGET_RECORDS):
-    all_records = []
-    page = 1
+    all_records = load_data()
+    all_records = _deduplicate_by_url(all_records)
+
+    page = len(all_records) // 20 + 1
     last_page = None
+
+    print(f"Starting with {len(all_records)} existing records.")
+    print(f"Starting from page {page}.")
 
     while len(all_records) < target_records:
         print(f"Fetching page {page}...")
 
-        html_text = fetch_page(page)
+        html_text = fetch_page_with_retries(page)
+
+        if html_text is None:
+            page += 1
+            time.sleep(DELAY_SECONDS)
+            continue
+
         results = extract_results_from_html(html_text)
 
         if last_page is None:
@@ -108,6 +165,12 @@ def scrape_data(target_records=TARGET_RECORDS):
 
         cleaned_records = [clean_record(record) for record in page_records]
         all_records.extend(cleaned_records)
+        all_records = _deduplicate_by_url(all_records)
+
+        if len(all_records) > target_records:
+            all_records = all_records[:target_records]
+
+        save_data(all_records)
 
         print(f"Collected {len(all_records)} records.")
 
@@ -118,17 +181,7 @@ def scrape_data(target_records=TARGET_RECORDS):
         page += 1
         time.sleep(DELAY_SECONDS)
 
-    return all_records[:target_records]
-
-
-def save_data(data, filename=OUTPUT_FILE):
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-
-def load_data(filename=OUTPUT_FILE):
-    with open(filename, "r", encoding="utf-8") as f:
-        return json.load(f)
+    return all_records
 
 
 if __name__ == "__main__":
