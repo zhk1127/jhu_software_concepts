@@ -1,0 +1,34 @@
+Cleaning Log
+============
+
+Input records: 1000
+Output records: 1000
+Records prepared for LLM input: 1000
+Comment fields changed by text cleaning: 0
+Missing GPA values found in comments by regex: 2
+
+Notes
+-----
+The program and university fields were combined into a single program field to match the input format expected by the TinyLlama standardizer. The original values are preserved as original_program and original_university.
+
+Examples Where Regex Found Missing GPA Information
+--------------------------------------------------
+
+Example 1
+URL: https://www.thegradcafe.com/result/1020122
+Before:
+  GPA: None
+  comments: Finally they released decision in May!! I have a masters degree from a university in the U.S., I have publications, GPA 3.75. I had an interview with a professor. Since last week my status was “Additional Review Required” and today it changed to blank and after a few hours changed to Deny. The only university that lacked proper communication and the process was weird!!
+After:
+  GPA: None
+  gpa_from_comments: 3.75
+
+Example 2
+URL: https://www.thegradcafe.com/result/1019472
+Before:
+  GPA: None
+  comments: M.S. in Computer Science GPA: 3.9/4
+After:
+  GPA: None
+  gpa_from_comments: 3.9
+
