@@ -1,11 +1,11 @@
 Cleaning Log
 ============
 
-Input records: 1000
-Output records: 1000
-Records prepared for LLM input: 1000
-Comment fields changed by text cleaning: 0
-Missing GPA values found in comments by regex: 2
+Input records: 35000
+Output records: 35000
+Records prepared for LLM input: 35000
+Comment fields changed by text cleaning: 1116
+Missing GPA values found in comments by regex: 3
 
 Notes
 -----
@@ -31,4 +31,13 @@ Before:
 After:
   GPA: None
   gpa_from_comments: 3.9
+
+Example 3
+URL: https://www.thegradcafe.com/result/1018540
+Before:
+  GPA: None
+  comments: Grad GPA 3.85 (Masters)
+After:
+  GPA: None
+  gpa_from_comments: 3.85
 

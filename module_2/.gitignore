@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
+llm_hosting/.venv/
+
+# LLM models
+models/
+llm_hosting/models/
+
+# Temporary files
+page1.html
+sample_out.jsonl
+llm_hosting/sample_out.jsonl
