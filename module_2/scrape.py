@@ -1,7 +1,18 @@
-import urllib3
+import json
+import time
+import html as html_lib
 from urllib.parse import urlencode
 
+import urllib3
+from bs4 import BeautifulSoup
+
+
 BASE_URL = "https://www.thegradcafe.com/survey"
+RESULT_BASE_URL = "https://www.thegradcafe.com/result/"
+OUTPUT_FILE = "applicant_data.json"
+
+TARGET_RECORDS = 1000
+DELAY_SECONDS = 1.0
 
 http = urllib3.PoolManager()
 
@@ -9,9 +20,8 @@ http = urllib3.PoolManager()
 def build_url(page=1):
     params = {
         "page": page,
-        "sort": "newest"
+        "sort": "newest",
     }
-
     return BASE_URL + "?" + urlencode(params)
 
 
@@ -22,39 +32,106 @@ def fetch_page(page=1):
         "GET",
         url,
         headers={
-            "User-Agent": "Mozilla/5.0"
-        }
+            "User-Agent": "Mozilla/5.0 (JHU Software Concepts student scraper)"
+        },
     )
 
-    print("Status:", response.status)
-    print("URL:", url)
+    if response.status != 200:
+        raise RuntimeError(f"Request failed with status {response.status}: {url}")
 
-    html = response.data.decode("utf-8", errors="replace")
-    import os
-    print("Current directory:", os.getcwd())
-    with open("page1.html", "w", encoding="utf-8") as f:
-     f.write(html)
+    return response.data.decode("utf-8", errors="replace")
 
-    print("Saved page1.html")
 
-    print("Length:", len(html))
-
-    from bs4 import BeautifulSoup
-
-    soup = BeautifulSoup(html, "html.parser")
-
+def extract_results_from_html(html_text):
+    soup = BeautifulSoup(html_text, "html.parser")
     app_div = soup.find("div", id="app")
 
-    print("Found app div:", app_div is not None)
+    if app_div is None:
+        raise ValueError("Could not find div with id='app'.")
 
-    print("Attributes:")
-    print(app_div.attrs.keys())
+    data_page = app_div.get("data-page")
 
-    data_page = app_div["data-page"]
+    if not data_page:
+        raise ValueError("Could not find data-page attribute.")
 
-    print("Length of data-page:", len(data_page))
-  
+    decoded = html_lib.unescape(data_page)
+    data = json.loads(decoded)
+
+    return data["props"]["results"]
+
+
+def clean_record(record):
+    result_id = record.get("id")
+
+    return {
+        "program": record.get("program"),
+        "university": record.get("school"),
+        "comments": record.get("notes"),
+        "date_added": record.get("added_on_label"),
+        "url": f"{RESULT_BASE_URL}{result_id}" if result_id else None,
+        "status": record.get("decision"),
+        "acceptance_date": record.get("acceptedDate"),
+        "rejection_date": record.get("rejectedDate"),
+        "waitlist_date": record.get("waitlistedDate"),
+        "interview_date": record.get("interviewDate"),
+        "term": record.get("season"),
+        "US/International": record.get("status"),
+        "GRE Score": record.get("greq"),
+        "GRE V Score": record.get("grev"),
+        "Degree": record.get("level"),
+        "GPA": record.get("ugpa"),
+        "GRE AW": record.get("grew"),
+        "raw_record": record,
+    }
+
+
+def scrape_data(target_records=TARGET_RECORDS):
+    all_records = []
+    page = 1
+    last_page = None
+
+    while len(all_records) < target_records:
+        print(f"Fetching page {page}...")
+
+        html_text = fetch_page(page)
+        results = extract_results_from_html(html_text)
+
+        if last_page is None:
+            last_page = results["meta"]["last_page"]
+            print(f"Last available page: {last_page}")
+
+        page_records = results["data"]
+
+        if not page_records:
+            print("No records found. Stopping.")
+            break
+
+        cleaned_records = [clean_record(record) for record in page_records]
+        all_records.extend(cleaned_records)
+
+        print(f"Collected {len(all_records)} records.")
+
+        if page >= last_page:
+            print("Reached final page. Stopping.")
+            break
+
+        page += 1
+        time.sleep(DELAY_SECONDS)
+
+    return all_records[:target_records]
+
+
+def save_data(data, filename=OUTPUT_FILE):
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def load_data(filename=OUTPUT_FILE):
+    with open(filename, "r", encoding="utf-8") as f:
+        return json.load(f)
+
 
 if __name__ == "__main__":
-    fetch_page(1)
-
+    records = scrape_data()
+    save_data(records)
+    print(f"Saved {len(records)} records to {OUTPUT_FILE}")
