@@ -8,7 +8,7 @@ DB_PASSWORD = "HKZ012514"
 DB_HOST = "localhost"
 DB_PORT = "5432"
 
-DATA_FILE = "../module_2/cleaned_applicant_data.json"
+DATA_FILE = "cleaned_applicant_data.json"
 
 
 def parse_float(value):
