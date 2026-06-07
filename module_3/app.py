@@ -8,6 +8,7 @@ from query_data import get_analysis_results, DB_CONFIG
 app = Flask(__name__)
 
 pull_process = None
+cached_results = None
 
 
 def pull_running():
@@ -36,26 +37,33 @@ def get_database_count():
     return count
 
 
+def get_cached_results():
+    global cached_results
+
+    if cached_results is None:
+        cached_results = get_analysis_results()
+
+    return cached_results
+
+
 @app.route("/")
 def home():
     is_running = pull_running()
 
     if is_running:
         pull_status = (
-            "Pull Data is currently running. "
-            "The app is scraping approximately 500 additional GradCafe records "
-            "and inserting new records into PostgreSQL."
+            "Pull Data is currently running. The app is scraping approximately "
+            "500 additional GradCafe records and inserting new records into PostgreSQL."
         )
     else:
         pull_status = (
-            "No data pull is currently running. "
-            "New data has been added if available. "
-            "Results are ready for analysis."
+            "No data pull is currently running. New data has been added if available. "
+            "Click Update Analysis to refresh the SQL results."
         )
 
     return render_template(
         "index.html",
-        results=get_analysis_results(),
+        results=get_cached_results(),
         database_count=get_database_count(),
         pull_running=is_running,
         pull_status=pull_status,
@@ -79,8 +87,12 @@ def pull_data():
 
 @app.route("/update-analysis", methods=["POST"])
 def update_analysis():
+    global cached_results
+
     if pull_running():
         return redirect(url_for("home"))
+
+    cached_results = get_analysis_results()
 
     return redirect(url_for("home"))
 

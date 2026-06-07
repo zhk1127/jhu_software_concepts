@@ -43,13 +43,22 @@ button {
 
 .status-panel {
     background-color: #eef6ff;
-    border: 1px solid #aac6dd;
-    padding: 12px;
-    margin-bottom: 20px;
+    border: 2px solid #4a90e2;
+    padding: 22px;
+    margin-bottom: 24px;
 }
 
-.status-panel p {
-    margin: 4px 0;
+.status-title {
+    font-size: 30px;
+    font-weight: bold;
+    color: #1f4e79;
+    margin-bottom: 12px;
+}
+
+.status-text {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1.6;
 }
 
 .message {

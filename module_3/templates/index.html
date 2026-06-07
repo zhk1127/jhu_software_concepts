@@ -38,15 +38,20 @@
     </p>
 
     <div class="status-panel">
-        <p>
-            <strong>Current database size:</strong>
-            {{ "{:,}".format(database_count) }} records
-        </p>
+        <div class="status-title">
+            Database Status
+        </div>
 
-        <p>
-            <strong>Pull status:</strong>
+        <div class="status-text">
+            Current database size:
+            {{ "{:,}".format(database_count) }}
+            records
+        </div>
+
+        <div class="status-text">
+            Pull status:
             {{ pull_status }}
-        </p>
+        </div>
     </div>
 
     {% if message %}
