@@ -1,22 +1,88 @@
 body {
     font-family: Arial, sans-serif;
     margin: 40px;
+    color: #222;
+    background-color: #ffffff;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #333;
+    padding-top: 10px;
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
 }
 
 h1 {
-    color: #333;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
-table {
-    border-collapse: collapse;
-    width: 90%;
+.buttons {
+    display: flex;
+    gap: 10px;
 }
 
-th, td {
-    border: 1px solid #ccc;
+button {
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.explanation {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.status-panel {
+    background-color: #eef6ff;
+    border: 1px solid #aac6dd;
+    padding: 12px;
+    margin-bottom: 20px;
+}
+
+.status-panel p {
+    margin: 4px 0;
+}
+
+.message {
+    background-color: #eef6ff;
+    border: 1px solid #99c;
     padding: 10px;
+    margin-bottom: 20px;
 }
 
-th {
-    background-color: #f2f2f2;
+.analysis-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.analysis-card {
+    background-color: #f5f5f5;
+    padding: 18px;
+    border-radius: 3px;
+    border: 1px solid #dddddd;
+}
+
+.analysis-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.analysis-card p {
+    margin-bottom: 0;
+    font-style: italic;
+}
+
+strong {
+    font-style: normal;
 }
