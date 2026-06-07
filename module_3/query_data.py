@@ -208,6 +208,69 @@ print("\nQuestion 8")
 print("How many 2026 acceptances are from applicants who applied to Georgetown, MIT, Stanford, or CMU for a PhD in Computer Science?")
 print(q8_result)
 
+# Question 10
+cur.execute("""
+SELECT COUNT(*)
+FROM applicants
+WHERE degree = 'PhD'
+  AND program ILIKE '%johns hopkins%'
+  AND (
+       program ILIKE '%bio%'
+    OR program ILIKE '%biochem%'
+    OR program ILIKE '%biomedical%'
+    OR program ILIKE '%biomolecular%'
+    OR program ILIKE '%biophysics%'
+    OR program ILIKE '%cellular%'
+    OR program ILIKE '%molecular%'
+    OR program ILIKE '%genetics%'
+    OR program ILIKE '%genomics%'
+    OR program ILIKE '%immunology%'
+    OR program ILIKE '%neuroscience%'
+  );
+""")
+
+jhu_bio_phd_count = cur.fetchone()[0]
+
+print("\nQuestion 10")
+print("How many applicants applied to Johns Hopkins University PhD programs in biology-related fields?")
+print(jhu_bio_phd_count)
+
+
+# Question 11
+cur.execute("""
+SELECT ROUND(
+    100.0 * SUM(
+        CASE
+            WHEN status = 'Accepted' THEN 1
+            ELSE 0
+        END
+    ) / COUNT(*),
+    2
+)
+FROM applicants
+WHERE degree = 'PhD'
+  AND program ILIKE '%johns hopkins%'
+  AND (
+       program ILIKE '%bio%'
+    OR program ILIKE '%biochem%'
+    OR program ILIKE '%biomedical%'
+    OR program ILIKE '%biomolecular%'
+    OR program ILIKE '%biophysics%'
+    OR program ILIKE '%cellular%'
+    OR program ILIKE '%molecular%'
+    OR program ILIKE '%genetics%'
+    OR program ILIKE '%genomics%'
+    OR program ILIKE '%immunology%'
+    OR program ILIKE '%neuroscience%'
+  );
+""")
+
+jhu_bio_phd_acceptance_rate = cur.fetchone()[0]
+
+print("\nQuestion 11")
+print("What is the acceptance rate of applicants who applied to Johns Hopkins University PhD programs in biology-related fields?")
+print(f"{jhu_bio_phd_acceptance_rate} %")
+
 
 cur.close()
 conn.close()

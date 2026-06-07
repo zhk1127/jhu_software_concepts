@@ -1,57 +1,44 @@
-# Module 3 - PostgreSQL Analysis of GradCafe Data
+# Module 3 - PostgreSQL and Flask Analysis
 
 ## Overview
 
-This project loads cleaned GradCafe applicant data into PostgreSQL and performs SQL-based analysis using Python.
+This project loads GradCafe application data into a PostgreSQL database, performs SQL analysis, and displays the results through a Flask web application.
 
-The project includes:
-
-* `load_data.py` – loads applicant records into PostgreSQL
-* `query_data.py` – answers Questions 1–8 using SQL queries
-* `q9_llm.py` – answers Question 9 using LLM-generated program and university fields
-* `cleaned_applicant_data.json` – cleaned applicant dataset (~35,000 records)
-* `llm_extend_applicant_data_full.jsonl` – LLM-processed dataset containing normalized program and university fields
+The dataset contains approximately 35,000 GradCafe application records.
 
 ---
 
-## Requirements
+## Files
 
-### Python Packages
+### Core Files
 
-Install psycopg:
+* `load_data.py` – Loads JSON application records into PostgreSQL
+* `query_data.py` – Executes SQL queries (Q1–Q11)
+* `q9_llm.py` – Evaluates Question 9 using LLM-generated fields
+* `app.py` – Flask web application
+* `requirements.txt` – Python package requirements
 
-```bash
-pip install "psycopg[binary]"
-```
+### Data Files
 
-### PostgreSQL
+* `cleaned_applicant_data.json` – Source dataset (~35,000 records)
+* `llm_extend_applicant_data_full.jsonl` – LLM-processed dataset with standardized program and university fields
 
-Create a PostgreSQL database named:
+### Flask Files
+
+* `templates/index.html` – Main analysis webpage
+* `static/style.css` – Page styling
+
+---
+
+## Database Setup
+
+Create database:
 
 ```sql
 CREATE DATABASE gradcafe_db;
 ```
 
----
-
-## Project Structure
-
-```text
-module_3/
-│
-├── cleaned_applicant_data.json
-├── llm_extend_applicant_data_full.jsonl
-├── load_data.py
-├── query_data.py
-├── q9_llm.py
-└── README.md
-```
-
----
-
-## Loading the Data
-
-Load the cleaned applicant dataset into PostgreSQL:
+Load data:
 
 ```bash
 python load_data.py
@@ -65,73 +52,119 @@ Loaded 35000 records into applicants table.
 
 ---
 
-## Running Questions 1–8
+## SQL Analysis Results
 
-Execute:
+### Q1
+
+How many entries applied for Fall 2026?
+
+**Answer:** 33,051
+
+### Q2
+
+What percentage of entries are international students?
+
+**Answer:** 44.85%
+
+### Q3
+
+Average GPA, GRE, GRE-V, and GRE-AW?
+
+**Answer:**
+
+* GPA = 3.77
+* GRE = 325.08
+* GRE-V = 160.64
+* GRE-AW = 4.35
+
+### Q4
+
+Average GPA of American applicants for Fall 2026?
+
+**Answer:** 3.79
+
+### Q5
+
+Acceptance rate for Fall 2026?
+
+**Answer:** 35.84%
+
+### Q6
+
+Average GPA of accepted Fall 2026 applicants?
+
+**Answer:** 3.77
+
+### Q7
+
+Number of Johns Hopkins Computer Science Master's applicants?
+
+**Answer:** 9
+
+### Q8
+
+Accepted 2026 PhD Computer Science applicants from Georgetown, MIT, Stanford, and Carnegie Mellon?
+
+**Answer:** 15
+
+### Q9
+
+Do results change when using LLM-generated fields?
+
+**Answer:** No.
+
+The LLM-generated dataset produced the same result as Q8.
+
+* Original dataset result: 15
+* LLM dataset result: 15
+
+### Q10
+
+How many applicants applied to Johns Hopkins University PhD programs in biology-related fields?
+
+**Answer:** 39
+
+### Q11
+
+What is the acceptance rate of applicants who applied to Johns Hopkins University PhD programs in biology-related fields?
+
+**Answer:** 20.51%
+
+---
+
+## Running the SQL Analysis
 
 ```bash
 python query_data.py
 ```
 
-This script connects to PostgreSQL and executes SQL queries to answer Questions 1–8.
-
-### Results
-
-| Question | Result                                                                                                 |
-| -------- | ------------------------------------------------------------------------------------------------------ |
-| Q1       | 33,051 Fall 2026 entries                                                                               |
-| Q2       | 44.85% International students                                                                          |
-| Q3       | GPA = 3.77, GRE = 325.08, GRE-V = 160.64, GRE-AW = 4.35                                                |
-| Q4       | Average GPA of American Fall 2026 applicants = 3.79                                                    |
-| Q5       | Acceptance rate for Fall 2026 = 35.84%                                                                 |
-| Q6       | Average GPA of accepted Fall 2026 applicants = 3.77                                                    |
-| Q7       | JHU Computer Science Master's applicants = 9                                                           |
-| Q8       | Accepted 2026 PhD Computer Science applicants from Georgetown, MIT, Stanford, and Carnegie Mellon = 15 |
-
 ---
 
-## Running Question 9
-
-Question 9 uses the LLM-generated fields to compare results obtained from normalized data versus the original downloaded fields.
-
-Execute:
+## Running the Flask Application
 
 ```bash
-python q9_llm.py
+python app.py
 ```
 
-The script analyzes:
-
-* `llm-generated-program`
-* `llm-generated-university`
-
-### Result
-
-Using the original downloaded fields, Question 8 identified **15** accepted PhD applicants in Computer Science from Georgetown University, MIT, Stanford University, and Carnegie Mellon University for 2026.
-
-Using the LLM-generated program and university fields, Question 9 also returned **15** matching applicants.
-
-Therefore, the LLM-generated fields produced the same final result as the original downloaded fields for this analysis.
-
----
-
-## Notes
-
-The LLM-processed dataset preserves the original scraped information while adding normalized fields:
+Open:
 
 ```text
-llm-generated-program
-llm-generated-university
+http://127.0.0.1:5000
 ```
 
-These fields allow structured analysis across records with varying naming conventions.
+The webpage displays the results of Questions Q1–Q11 in a formatted table.
 
 ---
 
-## Author
+## Requirements
 
-Hongkang Zhang
+Install dependencies:
 
-Johns Hopkins University
+```bash
+pip install -r requirements.txt
+```
 
-Software Concepts – Module 3
+Required packages:
+
+* Flask
+* psycopg2-binary

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GradCafe Analysis Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>GradCafe PostgreSQL Analysis</h1>
+
+    <table>
+        <tr>
+            <th>Question</th>
+            <th>Result</th>
+        </tr>
+
+        {% for question, result in results.items() %}
+        <tr>
+            <td>{{ question }}</td>
+            <td>{{ result }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+</body>
+</html>
