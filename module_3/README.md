@@ -1,199 +1,123 @@
-# Module 3 - PostgreSQL and Flask Analysis
+# GradCafe Analytics Dashboard (Module 3)
 
-## Overview
+## Project Overview
 
-This project loads GradCafe application data into a PostgreSQL database, performs SQL analysis, and displays the results through a Flask web application.
+This project analyzes graduate school admissions data from GradCafe using PostgreSQL and Flask. The workflow includes:
 
-The original dataset contains approximately 35,000 GradCafe application records. During Part B testing, additional records were successfully scraped and inserted, increasing the database size to approximately 36,000 records.
-
----
-
-## Files
-
-### Core Files
-
-* `load_data.py` – Loads JSON application records into PostgreSQL
-* `query_data.py` – Executes SQL queries (Q1–Q11)
-* `q9_llm.py` – Evaluates Question 9 using LLM-generated fields
-* `pull_new_data.py` – Reuses Module 2 scraping and cleaning code to retrieve additional GradCafe records and insert them into PostgreSQL
-* `app.py` – Flask web application
-* `requirements.txt` – Python package requirements
-
-### Data Files
-
-* `cleaned_applicant_data.json` – Original dataset (~35,000 records)
-* `additional_cleaned_applicant_data.json` – Additional records scraped during Pull Data operations
-* `llm_extend_applicant_data_full.jsonl` – LLM-processed dataset with standardized program and university fields
-
-### Flask Files
-
-* `templates/index.html` – Main analysis webpage
-* `static/style.css` – Page styling
-
-### Reused Module 2 Files
-
-* `module_2_code/scrape.py`
-* `module_2_code/clean.py`
-
-These files are reused by the Pull Data workflow.
+1. Scraping and cleaning GradCafe application records
+2. Loading records into PostgreSQL
+3. Running SQL analytics queries
+4. Displaying results in a Flask dashboard
+5. Pulling additional records and updating the database
 
 ---
 
-## Database Setup
+## Repository Structure
 
-Create database:
+```text
+module_3/
+├── app.py
+├── load_data.py
+├── query_data.py
+├── pull_new_data.py
+├── requirements.txt
+├── README.md
+├── limitations.pdf
+├── cleaned_applicant_data.json
+├── additional_applicant_data.json
+├── additional_cleaned_applicant_data.json
+├── templates/
+│   └── index.html
+├── static/
+│   └── style.css
+├── screenshots/
+│   ├── console_query_output.png
+│   ├── flask_dashboard.png
+│   ├── pulling_data.png
+│   └── data_pulled_and_analysis_updated.png
+└── module_2_code/
+```
+
+---
+
+## Environment Setup
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## PostgreSQL Setup
+
+Create the database:
 
 ```sql
 CREATE DATABASE gradcafe_db;
 ```
 
-Load data:
+Connect to the database:
+
+```sql
+\c gradcafe_db
+```
+
+---
+
+## Load Initial Data
+
+Load the cleaned GradCafe records into PostgreSQL:
 
 ```bash
 python load_data.py
 ```
 
-Expected output:
-
-```text
-Loaded 35000 records into applicants table.
-```
+This creates and populates the applicants table.
 
 ---
 
-## SQL Analysis Results
+## Run Analytics Queries
 
-### Q1
-
-How many entries applied for Fall 2026?
-
-**Answer:** 33,051
-
-### Q2
-
-What percentage of entries are international students?
-
-**Answer:** 44.85%
-
-### Q3
-
-Average GPA, GRE, GRE-V, and GRE-AW?
-
-**Answer:**
-
-* GPA = 3.77
-* GRE = 325.08
-* GRE-V = 160.64
-* GRE-AW = 4.35
-
-### Q4
-
-Average GPA of American applicants for Fall 2026?
-
-**Answer:** 3.79
-
-### Q5
-
-Acceptance rate for Fall 2026?
-
-**Answer:** 35.84%
-
-### Q6
-
-Average GPA of accepted Fall 2026 applicants?
-
-**Answer:** 3.77
-
-### Q7
-
-Number of Johns Hopkins Computer Science Master's applicants?
-
-**Answer:** 15
-
-### Q8
-
-Accepted 2026 PhD Computer Science applicants from Georgetown, MIT, Stanford, and Carnegie Mellon?
-
-**Answer:** 15
-
-### Q9
-
-Do results change when using LLM-generated fields?
-
-**Answer:** No.
-
-The LLM-generated dataset produced the same result as Q8.
-
-* Original dataset result: 15
-* LLM dataset result: 15
-
-### Q10
-
-How many applicants applied to Johns Hopkins University PhD programs in biology-related fields?
-
-**Answer:** 39
-
-### Q11
-
-What is the acceptance rate of applicants who applied to Johns Hopkins University PhD programs in biology-related fields?
-
-**Answer:** 20.51%
-
----
-
-## Part B - Pull Data Feature
-
-A new **Pull Data** button was added to the Flask dashboard.
-
-When clicked:
-
-1. Module 2 scraping code is executed.
-2. Approximately 500 additional GradCafe records are scraped.
-3. Records are cleaned using the Module 2 cleaning pipeline.
-4. Records are inserted into PostgreSQL.
-5. Duplicate records are skipped using the applicant identifier (`p_id`).
-6. The webpage automatically displays pull status information.
-7. Multiple concurrent pull requests are prevented.
-
-Example output:
-
-```text
-Collected 500 records
-Saved 500 records to additional_cleaned_applicant_data.json
-Inserted 1 new record into PostgreSQL
-Skipped 499 duplicate or invalid records
-Pull Data completed successfully
-```
-
----
-
-## Part B - Update Analysis Feature
-
-A new **Update Analysis** button was added to the Flask dashboard.
-
-The button:
-
-* Refreshes all SQL query results
-* Uses the latest contents of PostgreSQL
-* Is disabled while a Pull Data operation is running
-
-The dashboard also displays:
-
-* Current database size
-* Current pull status
-* Whether the application is ready for analysis
-
----
-
-## Running the SQL Analysis
+Execute:
 
 ```bash
 python query_data.py
 ```
 
+This runs all SQL queries and prints answers for Questions 1–11 in the terminal.
+
+Example output:
+
+```text
+Q1
+33051 Fall 2026 entries
+
+Q2
+47.66% International students
+
+...
+```
+
 ---
 
-## Running the Flask Application
+## Launch the Flask Dashboard
+
+Start the web application:
 
 ```bash
 python app.py
@@ -205,32 +129,87 @@ Open:
 http://127.0.0.1:5000
 ```
 
-The webpage displays the results of Questions Q1–Q11 and provides Pull Data and Update Analysis functionality.
+The dashboard displays:
+
+* Current database size
+* Pull Data status
+* SQL analytics results
 
 ---
 
-## Requirements
+## Pull New Data
 
-Install dependencies:
+Click:
 
-```bash
-pip install -r requirements.txt
+```text
+Pull Data
 ```
 
-Required packages:
+The application:
 
-* Flask
-* psycopg
-* BeautifulSoup4
-* Requests
+1. Determines the current database size
+2. Calculates a starting GradCafe page dynamically
+3. Scrapes approximately 500 additional records
+4. Cleans the records
+5. Inserts non-duplicate records into PostgreSQL
+
+The dashboard status panel updates automatically to indicate:
+
+```text
+Pull Data is currently running
+```
+
+and later:
+
+```text
+No data pull is currently running.
+New data has been added if available.
+Click Update Analysis to refresh the SQL results.
+```
+
+---
+
+## Refresh Analytics
+
+Click:
+
+```text
+Update Analysis
+```
+
+This reruns all SQL queries against the latest PostgreSQL database contents and refreshes the dashboard results.
+
+---
+
+## Screenshots
+
+The screenshots directory contains:
+
+* console_query_output.png
+* flask_dashboard.png
+* pulling_data.png
+* data_pulled_and_analysis_updated.png
+
+These demonstrate the SQL query output, Flask dashboard, live data pull workflow, and refreshed analytics.
 
 ---
 
 ## Limitations
 
-* GradCafe data quality depends on user-submitted information.
-* Some records contain missing GPA or GRE values.
-* Pull Data currently scrapes a fixed number of records per run.
-* Most SQL analysis uses original database fields.
-* Only Question 9 depends on LLM-generated standardized fields.
-* Flask is run using the built-in development server and is not intended for production deployment.
+See:
+
+```text
+limitations.pdf
+```
+
+for a discussion of the limitations of analyzing anonymously submitted admissions data and potential sources of bias.
+
+---
+
+## Author
+
+Hongkang Zhang
+
+Johns Hopkins University
+
+Software Concepts – Module 3
