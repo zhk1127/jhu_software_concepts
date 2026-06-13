@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Grad School Cafe Data Analysis</title>
+
+    {% if pull_running %}
+    <meta http-equiv="refresh" content="5">
+    {% endif %}
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div>
+            <div class="subtitle">Grad School Cafe Data Analysis</div>
+            <h1>Analysis</h1>
+        </div>
+
+        <div class="buttons">
+            <form action="/pull-data" method="post">
+                <button type="submit" data-testid="pull-data-btn">Pull Data</button>
+            </form>
+
+            <form action="/update-analysis" method="post">
+                <button type="submit" data-testid="update-analysis-btn">Update Analysis</button>
+            </form>
+        </div>
+    </div>
+
+    <p class="explanation">
+        Pull Data scrapes approximately 500 additional GradCafe records
+        and inserts new records into the PostgreSQL database.
+        Update Analysis refreshes the displayed SQL query results using
+        the latest database contents.
+    </p>
+
+    <div class="status-panel">
+        <div class="status-title">
+            Database Status
+        </div>
+
+        <div class="status-text">
+            Current database size:
+            {{ "{:,}".format(database_count) }}
+            records
+        </div>
+
+        <div class="status-text">
+            Pull status:
+            {{ pull_status }}
+        </div>
+    </div>
+
+    {% if message %}
+    <div class="message">
+        {{ message }}
+    </div>
+    {% endif %}
+
+    <div class="analysis-list">
+
+        <div class="analysis-card">
+            <h3>Q1. How many entries applied for Fall 2026?</h3>
+            <p><strong>Answer:</strong> {{ results["Q1"] }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <h3>Q2. What percentage of entries are from international students?</h3>
+            <p><strong>Answer:</strong> {{ results["Q2"] }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <h3>Q3. What is the average GPA, GRE, GRE-V, and GRE-AW of applicants who provided these metrics?</h3>
+            <p><strong>Answer:</strong> {{ results["Q3"] }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <h3>Q4. What is the average GPA of American students in Fall 2026?</h3>
+            <p><strong>Answer:</strong> {{ results["Q4"] }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <h3>Q5. What percent of Fall 2026 entries are acceptances?</h3>
+            <p><strong>Answer:</strong> {{ results["Q5"] }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <h3>Q6. What is the average GPA of applicants who applied for Fall 2026 and were accepted?</h3>
+            <p><strong>Answer:</strong> {{ results["Q6"] }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <h3>Q7. How many entries are from applicants who applied to Johns Hopkins University for a Master's degree in Computer Science?</h3>
+            <p><strong>Answer:</strong> {{ results["Q7"] }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <h3>Q8. How many accepted Fall 2026 PhD Computer Science applicants applied to Georgetown, MIT, Stanford, or Carnegie Mellon?</h3>
+            <p><strong>Answer:</strong> {{ results["Q8"] }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <h3>Q9. Does using the LLM-generated standardized fields produce the same answer as Question 8?</h3>
+            <p><strong>Answer:</strong> {{ results["Q9"] }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <h3>Q10. How many applicants applied to Johns Hopkins University for a PhD in biology-related fields?</h3>
+            <p><strong>Answer:</strong> {{ results["Q10"] }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <h3>Q11. What is the acceptance rate for applicants who applied to Johns Hopkins University PhD programs in biology-related fields?</h3>
+            <p><strong>Answer:</strong> {{ results["Q11"] }}</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
