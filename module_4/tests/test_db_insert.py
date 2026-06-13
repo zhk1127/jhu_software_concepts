@@ -170,3 +170,26 @@ def test_insert_records_skips_missing_id():
 
     assert inserted == 0
     assert skipped == 1
+
+@pytest.mark.db
+def test_load_data_main_with_fakes(monkeypatch, tmp_path):
+    fake_file = tmp_path / "fake_data.json"
+    fake_file.write_text(
+        '[{"raw_record": {"id": 123}, "program": "fake"}]',
+        encoding="utf-8",
+    )
+
+    calls = []
+
+    monkeypatch.setattr(load_data, "DATA_FILE", str(fake_file))
+
+    def fake_load_records(data):
+        calls.append(data)
+        return 1
+
+    monkeypatch.setattr(load_data, "load_records", fake_load_records)
+
+    load_data.main()
+
+    assert len(calls) == 1
+    assert calls[0][0]["raw_record"]["id"] == 123

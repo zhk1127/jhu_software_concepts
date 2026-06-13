@@ -32,3 +32,22 @@ def test_percentages_are_rendered_with_two_decimals():
 
     for percentage in percentages:
         assert re.match(r"^\d+\.\d{2}%$", percentage)
+
+from src import query_data
+
+
+@pytest.mark.analysis
+def test_get_llm_q9_count_skips_blank_lines(monkeypatch, tmp_path):
+    fake_file = tmp_path / "fake_llm.jsonl"
+
+    fake_file.write_text(
+        '\n'
+        '{"status": "Accepted", "term": "Fall 2026", "Degree": "PhD", '
+        '"llm-generated-program": "Computer Science", '
+        '"llm-generated-university": "MIT"}\n',
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(query_data, "LLM_FILE", str(fake_file))
+
+    assert query_data.get_llm_q9_count() == 1
