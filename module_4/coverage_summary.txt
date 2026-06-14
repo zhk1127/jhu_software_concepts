@@ -16,4 +16,4 @@ src\query_data.py         58      0   100%
 ----------------------------------------------------
 TOTAL                    248      0   100%
 Required test coverage of 100% reached. Total coverage: 100.00%
-28 passed, 1 warning in 7.30s
+28 passed, 1 warning in 6.20s
