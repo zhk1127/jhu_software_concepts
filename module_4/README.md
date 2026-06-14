@@ -1,4 +1,4 @@
-# GradCafe Analytics Dashboard (Module 3)
+# GradCafe Analytics Dashboard (Module 4)
 
 ## Project Overview
 
@@ -9,33 +9,34 @@ This project analyzes graduate school admissions data from GradCafe using Postgr
 3. Running SQL analytics queries
 4. Displaying results in a Flask dashboard
 5. Pulling additional records and updating the database
+6. Automated testing with pytest
+7. Continuous integration using GitHub Actions
+8. Sphinx documentation generation
 
 ---
 
 ## Repository Structure
 
 ```text
-module_3/
-├── app.py
-├── load_data.py
-├── query_data.py
-├── pull_new_data.py
+module_4/
+├── src/
+│   ├── app.py
+│   ├── load_data.py
+│   ├── query_data.py
+│   └── pull_new_data.py
+├── tests/
+├── docs/
+├── .github/
+│   └── workflows/
+│       └── tests.yml
 ├── requirements.txt
 ├── README.md
 ├── limitations.pdf
-├── cleaned_applicant_data.json
-├── additional_applicant_data.json
-├── additional_cleaned_applicant_data.json
 ├── templates/
 │   └── index.html
 ├── static/
 │   └── style.css
-├── screenshots/
-│   ├── console_query_output.png
-│   ├── flask_dashboard.png
-│   ├── pulling_data.png
-│   └── data_pulled_and_analysis_updated.png
-└── module_2_code/
+└── screenshots/
 ```
 
 ---
@@ -77,6 +78,8 @@ Connect to the database:
 \c gradcafe_db
 ```
 
+Update database credentials in the source files if necessary.
+
 ---
 
 ## Load Initial Data
@@ -84,10 +87,10 @@ Connect to the database:
 Load the cleaned GradCafe records into PostgreSQL:
 
 ```bash
-python load_data.py
+python -m src.load_data
 ```
 
-This creates and populates the applicants table.
+This creates and populates the `applicants` table.
 
 ---
 
@@ -96,7 +99,7 @@ This creates and populates the applicants table.
 Execute:
 
 ```bash
-python query_data.py
+python -m src.query_data
 ```
 
 This runs all SQL queries and prints answers for Questions 1–11 in the terminal.
@@ -120,13 +123,13 @@ Q2
 Start the web application:
 
 ```bash
-python app.py
+python -m src.app
 ```
 
 Open:
 
 ```text
-http://127.0.0.1:5000
+http://127.0.0.1:5000/analysis
 ```
 
 The dashboard displays:
@@ -181,16 +184,117 @@ This reruns all SQL queries against the latest PostgreSQL database contents and 
 
 ---
 
+## Automated Testing
+
+The project includes a comprehensive pytest suite covering:
+
+* Flask routes
+* Database operations
+* Data loading workflows
+* Pull Data functionality
+* Analysis updates
+* Utility functions
+
+Run all tests:
+
+```bash
+python -m pytest tests
+```
+
+Current test results:
+
+```text
+28 passed
+```
+
+---
+
+## Test Coverage
+
+Coverage is measured using pytest-cov.
+
+Run:
+
+```bash
+python -m pytest tests --cov=src --cov-report=term-missing
+```
+
+Current coverage:
+
+```text
+100% coverage
+```
+
+for all source files under `src/`.
+
+Command-line entry-point sections are excluded using the standard `coverage.py` mechanism (`# pragma: no cover`) so that coverage reflects application logic rather than script-launch boilerplate.
+
+---
+
+## Continuous Integration
+
+GitHub Actions automatically validates every push to the repository.
+
+The workflow:
+
+1. Starts a PostgreSQL service
+2. Creates the GradCafe database
+3. Installs project dependencies
+4. Loads test data
+5. Runs the full pytest suite
+6. Verifies coverage requirements
+
+Workflow configuration:
+
+```text
+.github/workflows/tests.yml
+```
+
+---
+
+## Documentation
+
+Sphinx documentation is provided in:
+
+```text
+docs/
+```
+
+Generate documentation:
+
+```bash
+cd docs
+
+python -m sphinx -b html source build/html
+```
+
+Open:
+
+```text
+docs/build/html/index.html
+```
+
+Documentation includes:
+
+* Architecture overview
+* ETL workflow
+* Database layer
+* Analysis layer
+* Flask web layer
+* Automatically generated API reference pages
+
+---
+
 ## Screenshots
 
-The screenshots directory contains:
+The screenshots directory contains examples of:
 
-* console_query_output.png
-* flask_dashboard.png
-* pulling_data.png
-* data_pulled_and_analysis_updated.png
-
-These demonstrate the SQL query output, Flask dashboard, live data pull workflow, and refreshed analytics.
+* SQL query output
+* Flask dashboard
+* Pull Data workflow
+* Updated analytics
+* GitHub Actions execution
+* Coverage results
 
 ---
 
@@ -212,4 +316,4 @@ Hongkang Zhang
 
 Johns Hopkins University
 
-Software Concepts – Module 3
+Software Concepts – Module 4
