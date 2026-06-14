@@ -1,5 +1,19 @@
 # GradCafe Analytics Dashboard (Module 4)
 
+## Repository Information
+
+GitHub SSH URL
+
+git@github.com:zhk1127/jhu_software_concepts.git
+
+GitHub Repository
+
+https://github.com/zhk1127/jhu_software_concepts
+
+Read the Docs Documentation
+
+https://zhk1127-jhu-software-concepts.readthedocs.io/en/latest/
+
 ## Project Overview
 
 This project analyzes graduate school admissions data from GradCafe using PostgreSQL and Flask. The workflow includes:
