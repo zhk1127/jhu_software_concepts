@@ -263,15 +263,8 @@ The documentation includes:
 
 ## Screenshots
 
-The screenshots directory contains examples of:
 
-* SQL query output
-* Flask dashboard
-* Pull Data workflow
-* Updated analytics results
-* GitHub Actions execution
-* Coverage reports
-
+The screenshots directory contains screenshots collected during development, testing, and documentation of the GradCafe analytics application.
 ---
 
 ## Limitations
