@@ -44,6 +44,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">app module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#src.app.create_app"><code class="docutils literal notranslate"><span class="pre">create_app()</span></code></a></li>
@@ -83,10 +84,26 @@
              
   <section id="module-src.app">
 <span id="app-module"></span><h1>app module<a class="headerlink" href="#module-src.app" title="Link to this heading"></a></h1>
+<p>Flask web application for GradCafe analytics.</p>
+<p>This module creates the Flask application, renders the analytics
+dashboard, launches background data pulls, and refreshes SQL
+analysis results stored in PostgreSQL.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.app.create_app">
 <span class="sig-prename descclassname"><span class="pre">src.app.</span></span><span class="sig-name descname"><span class="pre">create_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.app.create_app" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Create and configure the Flask application.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional configuration overrides used during testing.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured Flask application instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flask</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

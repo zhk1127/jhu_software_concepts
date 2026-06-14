@@ -44,6 +44,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="app.html">app module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">load_data module</a><ul>
@@ -91,10 +92,15 @@
              
   <section id="module-src.load_data">
 <span id="load-data-module"></span><h1>load_data module<a class="headerlink" href="#module-src.load_data" title="Link to this heading"></a></h1>
+<p>Load cleaned GradCafe applicant records into PostgreSQL.</p>
+<p>This module creates the applicants table, loads applicant
+records from JSON files, and provides helper functions for
+database access and record conversion.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.load_data.create_table">
 <span class="sig-prename descclassname"><span class="pre">src.load_data.</span></span><span class="sig-name descname"><span class="pre">create_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.load_data.create_table" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Create the applicants table if it does not already exist.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.load_data.get_connection">
@@ -104,17 +110,48 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="src.load_data.get_database_count">
 <span class="sig-prename descclassname"><span class="pre">src.load_data.</span></span><span class="sig-name descname"><span class="pre">get_database_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.load_data.get_database_count" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Return the total number of records in the applicants table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of applicant records.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.load_data.get_database_url">
 <span class="sig-prename descclassname"><span class="pre">src.load_data.</span></span><span class="sig-name descname"><span class="pre">get_database_url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.load_data.get_database_url" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Return the PostgreSQL connection URL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Database connection string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.load_data.load_records">
 <span class="sig-prename descclassname"><span class="pre">src.load_data.</span></span><span class="sig-name descname"><span class="pre">load_records</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.load_data.load_records" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Insert applicant records into PostgreSQL.</p>
+<p>Duplicate records are ignored using ON CONFLICT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>list</em>) – List of cleaned applicant records.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of records inserted.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.load_data.main">

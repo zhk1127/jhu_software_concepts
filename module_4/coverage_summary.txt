@@ -1,0 +1,19 @@
+............................                                             [100%]
+============================== warnings summary ===============================
+tests/test_analysis_format.py::test_query_data_main
+  <frozen runpy>:130: RuntimeWarning: 'src.query_data' found in sys.modules after import of package 'src', but prior to execution of 'src.query_data'; this may result in unpredictable behaviour
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.14.5-final-0 _______________
+
+Name                   Stmts   Miss  Cover   Missing
+----------------------------------------------------
+src\app.py                47      0   100%
+src\load_data.py          51      0   100%
+src\pull_new_data.py      92      0   100%
+src\query_data.py         58      0   100%
+----------------------------------------------------
+TOTAL                    248      0   100%
+Required test coverage of 100% reached. Total coverage: 100.00%
+28 passed, 1 warning in 7.30s

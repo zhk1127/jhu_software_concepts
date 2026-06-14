@@ -43,6 +43,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="app.html">app module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="load_data.html">load_data module</a></li>
@@ -83,15 +84,39 @@
              
   <section id="module-src.query_data">
 <span id="query-data-module"></span><h1>query_data module<a class="headerlink" href="#module-src.query_data" title="Link to this heading"></a></h1>
+<p>Generate analytics results from GradCafe admissions data.</p>
+<p>This module executes SQL queries against PostgreSQL and
+returns formatted answers for Questions 1–11 used by
+the Flask dashboard and assignment analysis.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.query_data.get_analysis_results">
 <span class="sig-prename descclassname"><span class="pre">src.query_data.</span></span><span class="sig-name descname"><span class="pre">get_analysis_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.query_data.get_analysis_results" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Execute all analytics queries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary mapping question identifiers
+(Q1–Q11) to formatted answers.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.query_data.get_llm_q9_count">
 <span class="sig-prename descclassname"><span class="pre">src.query_data.</span></span><span class="sig-name descname"><span class="pre">get_llm_q9_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.query_data.get_llm_q9_count" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Count accepted Computer Science PhD applicants using
+LLM-generated university and program annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of matching applicants.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

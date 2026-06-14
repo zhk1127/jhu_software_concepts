@@ -12,6 +12,7 @@ This project analyzes graduate school admissions data from GradCafe using Postgr
 6. Automated testing with pytest
 7. Continuous integration using GitHub Actions
 8. Sphinx documentation generation
+9. Read the Docs deployment
 
 ---
 
@@ -31,11 +32,11 @@ module_4/
 │       └── tests.yml
 ├── requirements.txt
 ├── README.md
+├── coverage_summary.txt
+├── actions_success.png
 ├── limitations.pdf
 ├── templates/
-│   └── index.html
 ├── static/
-│   └── style.css
 └── screenshots/
 ```
 
@@ -84,43 +85,25 @@ Update database credentials in the source files if necessary.
 
 ## Load Initial Data
 
-Load the cleaned GradCafe records into PostgreSQL:
-
 ```bash
 python -m src.load_data
 ```
 
-This creates and populates the `applicants` table.
+This creates and populates the applicants table.
 
 ---
 
 ## Run Analytics Queries
 
-Execute:
-
 ```bash
 python -m src.query_data
 ```
 
-This runs all SQL queries and prints answers for Questions 1–11 in the terminal.
-
-Example output:
-
-```text
-Q1
-33051 Fall 2026 entries
-
-Q2
-47.66% International students
-
-...
-```
+This executes all SQL analysis queries and prints answers for Questions 1–11.
 
 ---
 
 ## Launch the Flask Dashboard
-
-Start the web application:
 
 ```bash
 python -m src.app
@@ -142,58 +125,32 @@ The dashboard displays:
 
 ## Pull New Data
 
-Click:
+The **Pull Data** button:
 
-```text
-Pull Data
-```
-
-The application:
-
-1. Determines the current database size
-2. Calculates a starting GradCafe page dynamically
-3. Scrapes approximately 500 additional records
-4. Cleans the records
+1. Determines current database size
+2. Calculates the appropriate starting GradCafe page
+3. Scrapes approximately 500 new records
+4. Cleans and standardizes records
 5. Inserts non-duplicate records into PostgreSQL
-
-The dashboard status panel updates automatically to indicate:
-
-```text
-Pull Data is currently running
-```
-
-and later:
-
-```text
-No data pull is currently running.
-New data has been added if available.
-Click Update Analysis to refresh the SQL results.
-```
 
 ---
 
 ## Refresh Analytics
 
-Click:
-
-```text
-Update Analysis
-```
-
-This reruns all SQL queries against the latest PostgreSQL database contents and refreshes the dashboard results.
+The **Update Analysis** button reruns all SQL queries and refreshes dashboard results using the latest database contents.
 
 ---
 
 ## Automated Testing
 
-The project includes a comprehensive pytest suite covering:
+The project includes comprehensive pytest coverage for:
 
 * Flask routes
 * Database operations
 * Data loading workflows
 * Pull Data functionality
 * Analysis updates
-* Utility functions
+* Integration workflows
 
 Run all tests:
 
@@ -201,7 +158,7 @@ Run all tests:
 python -m pytest tests
 ```
 
-Current test results:
+Current result:
 
 ```text
 28 passed
@@ -219,52 +176,61 @@ Run:
 python -m pytest tests --cov=src --cov-report=term-missing
 ```
 
-Current coverage:
+Current result:
 
 ```text
 100% coverage
 ```
 
-for all source files under `src/`.
+Coverage proof is included in:
 
-Command-line entry-point sections are excluded using the standard `coverage.py` mechanism (`# pragma: no cover`) so that coverage reflects application logic rather than script-launch boilerplate.
+```text
+coverage_summary.txt
+```
 
 ---
 
 ## Continuous Integration
 
-GitHub Actions automatically validates every push to the repository.
+GitHub Actions automatically validates every push.
 
 The workflow:
 
-1. Starts a PostgreSQL service
-2. Creates the GradCafe database
-3. Installs project dependencies
-4. Loads test data
-5. Runs the full pytest suite
+1. Starts PostgreSQL
+2. Creates the database
+3. Installs dependencies
+4. Initializes test data
+5. Executes the full pytest suite
 6. Verifies coverage requirements
 
-Workflow configuration:
+Workflow file:
 
 ```text
 .github/workflows/tests.yml
+```
+
+Proof of successful CI execution is included in:
+
+```text
+actions_success.png
 ```
 
 ---
 
 ## Documentation
 
-Sphinx documentation is provided in:
+### Local Sphinx Build
+
+Documentation source files are located in:
 
 ```text
 docs/
 ```
 
-Generate documentation:
+Generate documentation locally:
 
 ```bash
 cd docs
-
 python -m sphinx -b html source build/html
 ```
 
@@ -274,14 +240,24 @@ Open:
 docs/build/html/index.html
 ```
 
-Documentation includes:
+### Read the Docs
+
+Published documentation:
+
+```text
+https://zhk1127-jhu-software-concepts.readthedocs.io/en/latest/
+```
+
+The documentation includes:
 
 * Architecture overview
-* ETL workflow
+* Data flow
+* ETL layer
 * Database layer
 * Analysis layer
-* Flask web layer
-* Automatically generated API reference pages
+* Web layer
+* Testing and CI
+* Auto-generated API documentation from source code docstrings
 
 ---
 
@@ -292,9 +268,9 @@ The screenshots directory contains examples of:
 * SQL query output
 * Flask dashboard
 * Pull Data workflow
-* Updated analytics
+* Updated analytics results
 * GitHub Actions execution
-* Coverage results
+* Coverage reports
 
 ---
 
@@ -306,9 +282,41 @@ See:
 limitations.pdf
 ```
 
-for a discussion of the limitations of analyzing anonymously submitted admissions data and potential sources of bias.
+for discussion of limitations and potential biases in anonymously submitted admissions data.
 
 ---
+
+## Deliverables Included
+
+The following deliverables required by the assignment are included in this submission:
+
+* GitHub repository (public)
+
+* README.md
+
+* requirements.txt
+
+* coverage_summary.txt
+
+* actions_success.png
+
+* .github/workflows/tests.yml
+
+* Sphinx-generated HTML documentation under `docs/build/html`
+
+* Read the Docs deployment:
+
+  https://zhk1127-jhu-software-concepts.readthedocs.io/en/latest/
+
+* All required source files under `src/`
+
+* All required pytest test files under `tests/`
+
+* limitations.pdf
+
+The GitHub Actions workflow successfully executes the complete pytest suite and verifies 100% test coverage. Documentation is generated with Sphinx and published through Read the Docs.
+
+
 
 ## Author
 
