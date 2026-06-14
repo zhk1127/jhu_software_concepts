@@ -55,7 +55,7 @@ def test_get_llm_q9_count_skips_blank_lines(monkeypatch, tmp_path):
 import runpy
 from src import query_data
 
-
+@pytest.mark.analysis
 def test_query_data_main(monkeypatch):
 
     monkeypatch.setattr(
