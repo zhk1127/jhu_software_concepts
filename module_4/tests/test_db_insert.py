@@ -3,7 +3,7 @@ import pytest
 from src import load_data
 
 
-TEST_ID =  999999001
+TEST_ID =  "999999001"
 
 
 def sample_record():
@@ -96,7 +96,7 @@ from src import pull_new_data
 
 @pytest.mark.db
 def test_insert_records_into_database():
-    test_id = 999999002
+    test_id = "999999002"
 
     conn = pull_new_data.psycopg.connect(**pull_new_data.DB_CONFIG)
     cur = conn.cursor()
