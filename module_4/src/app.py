@@ -1,3 +1,12 @@
+
+"""
+Flask web application for GradCafe analytics.
+
+This module creates the Flask application, renders the analytics
+dashboard, launches background data pulls, and refreshes SQL
+analysis results stored in PostgreSQL.
+"""
+
 from flask import Flask, render_template, redirect, url_for, jsonify
 import subprocess
 import sys
@@ -7,6 +16,17 @@ from src.load_data import get_database_count
 
 
 def create_app(config=None):
+    """
+    Create and configure the Flask application.
+
+    Args:
+        config (dict, optional):
+            Optional configuration overrides used during testing.
+
+    Returns:
+        Flask:
+            Configured Flask application instance.
+    """
     app = Flask(
         __name__,
         template_folder="../templates",

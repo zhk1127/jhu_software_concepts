@@ -1,3 +1,10 @@
+"""
+Load cleaned GradCafe applicant records into PostgreSQL.
+
+This module creates the applicants table, loads applicant
+records from JSON files, and provides helper functions for
+database access and record conversion.
+"""
 import json
 import os
 import psycopg
@@ -9,6 +16,13 @@ DEFAULT_DATABASE_URL = "postgresql://postgres:HKZ012514@localhost:5432/gradcafe_
 
 
 def get_database_url():
+    """
+    Return the PostgreSQL connection URL.
+
+    Returns:
+        str:
+            Database connection string.
+    """
     return os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 
 
@@ -17,6 +31,9 @@ def get_connection():
 
 
 def create_table():
+    """
+    Create the applicants table if it does not already exist.
+    """
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -81,6 +98,19 @@ def record_to_tuple(item):
 
 
 def load_records(data):
+    """
+    Insert applicant records into PostgreSQL.
+
+    Duplicate records are ignored using ON CONFLICT.
+
+    Args:
+        data (list):
+            List of cleaned applicant records.
+
+    Returns:
+        int:
+            Number of records inserted.
+    """
     create_table()
 
     insert_sql = """
@@ -105,6 +135,13 @@ def load_records(data):
 
 
 def get_database_count():
+    """
+    Return the total number of records in the applicants table.
+
+    Returns:
+        int:
+            Number of applicant records.
+    """
     create_table()
 
     with get_connection() as conn:

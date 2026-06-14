@@ -1,3 +1,10 @@
+"""
+Pull additional GradCafe applicant records and update PostgreSQL.
+
+This module scrapes new GradCafe pages, cleans the records,
+saves intermediate JSON files, and inserts new records into
+the applicants database while avoiding duplicates.
+"""
 import json
 import time
 import sys
@@ -50,6 +57,14 @@ def save_json(data, filename):
 
 
 def get_start_page():
+    """
+    Calculate the GradCafe page number used as the starting
+    point for incremental scraping.
+
+    Returns:
+        int:
+            Starting page number.
+    """
     conn = psycopg.connect(**DB_CONFIG)
     cur = conn.cursor()
 
@@ -68,6 +83,13 @@ def get_start_page():
 
 
 def scrape_new_records():
+    """
+    Scrape approximately 500 new GradCafe records.
+
+    Returns:
+        list:
+            List of cleaned applicant records.
+    """
     all_records = []
 
     page = get_start_page()
@@ -107,6 +129,17 @@ def scrape_new_records():
 
 
 def insert_records_into_database(records):
+    """
+    Insert new applicant records into PostgreSQL.
+
+    Args:
+        records (list):
+            Cleaned applicant records.
+
+    Returns:
+        tuple:
+            (inserted_count, skipped_count)
+    """
     conn = psycopg.connect(**DB_CONFIG)
     cur = conn.cursor()
 
@@ -179,6 +212,16 @@ def insert_records_into_database(records):
 
 
 def main():
+    """
+    Execute the complete data pull workflow.
+
+    The workflow:
+    1. Scrapes new records.
+    2. Saves raw JSON.
+    3. Cleans records.
+    4. Saves cleaned JSON.
+    5. Inserts records into PostgreSQL.
+    """
     raw_records = scrape_new_records()
 
     save_json(raw_records, RAW_OUTPUT_FILE)

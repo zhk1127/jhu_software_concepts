@@ -1,3 +1,10 @@
+"""
+Generate analytics results from GradCafe admissions data.
+
+This module executes SQL queries against PostgreSQL and
+returns formatted answers for Questions 1–11 used by
+the Flask dashboard and assignment analysis.
+"""
 import json
 import psycopg
 
@@ -13,6 +20,14 @@ LLM_FILE = "llm_extend_applicant_data_full.jsonl"
 
 
 def get_llm_q9_count():
+    """
+    Count accepted Computer Science PhD applicants using
+    LLM-generated university and program annotations.
+
+    Returns:
+        int:
+            Number of matching applicants.
+    """
     target_universities = {
         "Georgetown University",
         "Massachusetts Institute of Technology",
@@ -49,6 +64,14 @@ def get_llm_q9_count():
 
 
 def get_analysis_results():
+    """
+    Execute all analytics queries.
+
+    Returns:
+        dict:
+            Dictionary mapping question identifiers
+            (Q1–Q11) to formatted answers.
+    """
     conn = psycopg.connect(**DB_CONFIG)
     cur = conn.cursor()
 
