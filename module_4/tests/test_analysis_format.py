@@ -51,3 +51,20 @@ def test_get_llm_q9_count_skips_blank_lines(monkeypatch, tmp_path):
     monkeypatch.setattr(query_data, "LLM_FILE", str(fake_file))
 
     assert query_data.get_llm_q9_count() == 1
+
+import runpy
+from src import query_data
+
+
+def test_query_data_main(monkeypatch):
+
+    monkeypatch.setattr(
+        query_data,
+        "get_analysis_results",
+        lambda: {"Q1": "answer"}
+    )
+
+    runpy.run_module(
+        "src.query_data",
+        run_name="__main__"
+    )

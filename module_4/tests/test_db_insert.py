@@ -193,3 +193,5 @@ def test_load_data_main_with_fakes(monkeypatch, tmp_path):
 
     assert len(calls) == 1
     assert calls[0][0]["raw_record"]["id"] == 123
+
+import runpy

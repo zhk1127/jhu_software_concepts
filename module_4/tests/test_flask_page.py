@@ -76,3 +76,7 @@ def test_analysis_shows_running_status():
 
     assert response.status_code == 200
     assert "Pull Data is currently running" in html
+
+    import runpy
+from src import app as app_module
+

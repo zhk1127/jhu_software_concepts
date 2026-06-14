@@ -121,5 +121,5 @@ def main():
     print(f"Inserted {inserted} new records into applicants table.")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     main()
