@@ -1,0 +1,30 @@
+# Virtual environment
+.venv/
+
+# Environment variables / secrets
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# VS Code
+.vscode/
+
+# Sphinx build output
+docs/build/
+
+# Python cache
+__pycache__/
+
+docs/build/
+docs/source/_autosummary/docs/build/
+additional_applicant_data.json
+additional_cleaned_applicant_data.json
