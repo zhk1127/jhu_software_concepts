@@ -6,12 +6,12 @@ returns formatted answers for Questions 1–11 used by
 the Flask dashboard and assignment analysis.
 """
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
 import json
 import psycopg
+from dotenv import load_dotenv
+from psycopg import sql
+
+load_dotenv()
 
 DB_CONFIG = {
     "dbname": os.getenv("DB_NAME"),
@@ -184,7 +184,8 @@ def get_analysis_results():
     results["Q9"] = f"LLM-generated fields produced the same result as Q8 ({q9})"
 
     # Q10
-    bio_filter = """
+       # Q10
+    bio_filter = sql.SQL("""
         degree = 'PhD'
         AND program ILIKE '%johns hopkins%'
         AND (
@@ -200,26 +201,37 @@ def get_analysis_results():
             OR program ILIKE '%immunology%'
             OR program ILIKE '%neuroscience%'
         )
-    """
+    """)
 
-    cur.execute(f"""
+    q10_stmt = sql.SQL("""
         SELECT COUNT(*)
         FROM applicants
-        WHERE {bio_filter};
-    """)
-    results["Q10"] = f"JHU biology-related PhD applicants = {cur.fetchone()[0]}"
+        WHERE {bio_filter}
+        LIMIT 1
+    """).format(bio_filter=bio_filter)
+
+    cur.execute(q10_stmt)
+    results["Q10"] = (
+        f"JHU biology-related PhD applicants = {cur.fetchone()[0]}"
+    )
 
     # Q11
-    cur.execute(f"""
+    q11_stmt = sql.SQL("""
         SELECT ROUND(
             100.0 * SUM(CASE WHEN status = 'Accepted' THEN 1 ELSE 0 END)
             / COUNT(*),
             2
         )
         FROM applicants
-        WHERE {bio_filter};
-    """)
-    results["Q11"] = f"Acceptance rate for JHU biology-related PhD applicants = {cur.fetchone()[0]}%"
+        WHERE {bio_filter}
+        LIMIT 1
+    """).format(bio_filter=bio_filter)
+
+    cur.execute(q11_stmt)
+    results["Q11"] = (
+        "Acceptance rate for JHU biology-related PhD applicants = "
+        f"{cur.fetchone()[0]}%"
+    )
 
     cur.close()
     conn.close()
@@ -228,9 +240,9 @@ def get_analysis_results():
 
 
 if __name__ == "__main__":
-    results = get_analysis_results()
+    analysis_results = get_analysis_results()
 
-    for question, answer in results.items():
+    for question, answer in analysis_results.items():
         print(question)
         print(answer)
         print()

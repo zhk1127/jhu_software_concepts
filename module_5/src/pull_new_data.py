@@ -6,20 +6,22 @@ saves intermediate JSON files, and inserts new records into
 the applicants database while avoiding duplicates.
 """
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
 import json
 import time
 import sys
 
 import psycopg
 
-sys.path.append("module_2_code")
+from dotenv import load_dotenv
+from module_2_code.scrape import (
+    fetch_page_with_retries,
+    extract_results_from_html,
+    clean_record,
+)
+from module_2_code.clean import clean_data
 
-from scrape import fetch_page_with_retries, extract_results_from_html, clean_record
-from clean import clean_data
+load_dotenv()
+sys.path.append("module_2_code")
 
 TARGET_RECORDS = 500
 RECORDS_PER_PAGE = 20
@@ -37,6 +39,7 @@ DB_CONFIG = {
 
 
 def to_float(value):
+    """Convert a value to float, returning None for invalid inputs."""
     if value in (None, "", "None"):
         return None
 
@@ -47,6 +50,7 @@ def to_float(value):
 
 
 def to_int(value):
+    """Convert a value to integer, returning None for invalid inputs."""
     if value in (None, "", "None"):
         return None
 
@@ -57,6 +61,7 @@ def to_int(value):
 
 
 def save_json(data, filename):
+    """save the data as the josn file."""
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 

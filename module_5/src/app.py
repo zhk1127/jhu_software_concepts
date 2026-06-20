@@ -1,4 +1,3 @@
-
 """
 Flask web application for GradCafe analytics.
 
@@ -7,12 +6,12 @@ dashboard, launches background data pulls, and refreshes SQL
 analysis results stored in PostgreSQL.
 """
 
-from flask import Flask, render_template, redirect, url_for, jsonify
 import subprocess
 import sys
 
-from src.query_data import get_analysis_results
+from flask import Flask, jsonify, redirect, render_template, url_for
 from src.load_data import get_database_count
+from src.query_data import get_analysis_results
 
 
 def create_app(config=None):
@@ -27,24 +26,25 @@ def create_app(config=None):
         Flask:
             Configured Flask application instance.
     """
-    app = Flask(
+    flask_app = Flask(
         __name__,
         template_folder="../templates",
         static_folder="../static",
     )
 
-    app.config.update(
+    flask_app.config.update(
         TESTING=False,
         PULL_PROCESS=None,
         CACHED_RESULTS=None,
-        SCRAPER_COMMAND=[sys.executable, "-u", "src/pull_new_data.py"],
+        SCRAPER_COMMAND=[sys.executable, "-m", "src.pull_new_data"],
     )
 
     if config:
-        app.config.update(config)
+        flask_app.config.update(config)
 
     def pull_running():
-        process = app.config.get("PULL_PROCESS")
+        """Return whether a background data pull is currently running."""
+        process = flask_app.config.get("PULL_PROCESS")
 
         if process is None:
             return False
@@ -52,21 +52,24 @@ def create_app(config=None):
         if process.poll() is None:
             return True
 
-        app.config["PULL_PROCESS"] = None
+        flask_app.config["PULL_PROCESS"] = None
         return False
 
     def get_cached_results():
-        if app.config.get("CACHED_RESULTS") is None:
-            app.config["CACHED_RESULTS"] = get_analysis_results()
+        """Return cached analysis results, computing them if needed."""
+        if flask_app.config.get("CACHED_RESULTS") is None:
+            flask_app.config["CACHED_RESULTS"] = get_analysis_results()
 
-        return app.config["CACHED_RESULTS"]
+        return flask_app.config["CACHED_RESULTS"]
 
-    @app.route("/")
+    @flask_app.route("/")
     def home():
+        """Redirect the home page to the analysis dashboard."""
         return redirect(url_for("analysis"))
 
-    @app.route("/analysis")
+    @flask_app.route("/analysis")
     def analysis():
+        """Render the GradCafe analysis dashboard."""
         is_running = pull_running()
 
         if is_running:
@@ -89,25 +92,27 @@ def create_app(config=None):
             message="",
         )
 
-    @app.route("/pull-data", methods=["POST"])
+    @flask_app.route("/pull-data", methods=["POST"])
     def pull_data():
+        """Start a background data pull if one is not already running."""
         if pull_running():
             return jsonify({"busy": True}), 409
 
-        process = subprocess.Popen(app.config["SCRAPER_COMMAND"])
-        app.config["PULL_PROCESS"] = process
+        process = subprocess.Popen(flask_app.config["SCRAPER_COMMAND"])
+        flask_app.config["PULL_PROCESS"] = process
 
         return jsonify({"ok": True}), 200
 
-    @app.route("/update-analysis", methods=["POST"])
+    @flask_app.route("/update-analysis", methods=["POST"])
     def update_analysis():
+        """Refresh cached analysis results if no data pull is running."""
         if pull_running():
             return jsonify({"busy": True}), 409
 
-        app.config["CACHED_RESULTS"] = get_analysis_results()
+        flask_app.config["CACHED_RESULTS"] = get_analysis_results()
         return jsonify({"ok": True}), 200
 
-    return app
+    return flask_app
 
 
 app = create_app()

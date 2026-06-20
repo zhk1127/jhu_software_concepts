@@ -7,15 +7,14 @@ database access and record conversion.
 """
 import json
 import os
-import psycopg
+
 from datetime import datetime
 
-DATA_FILE = "cleaned_applicant_data.json"
-
-import os
+import psycopg
 from dotenv import load_dotenv
 
 load_dotenv()
+DATA_FILE = "cleaned_applicant_data.json"
 
 DEFAULT_DATABASE_URL = os.getenv(
     "DATABASE_URL",
@@ -34,6 +33,7 @@ def get_database_url():
 
 
 def get_connection():
+    """Create and return a PostgreSQL database connection."""
     return psycopg.connect(get_database_url())
 
 
@@ -67,6 +67,7 @@ def create_table():
 
 
 def parse_float(value):
+    """Convert a value to float, returning None for invalid inputs."""
     if value in (None, "", "None", "null"):
         return None
     try:
@@ -76,6 +77,7 @@ def parse_float(value):
 
 
 def parse_date(value):
+    """Convert a date string into a Python date object."""
     if not value:
         return None
     try:
@@ -85,6 +87,7 @@ def parse_date(value):
 
 
 def record_to_tuple(item):
+    """Convert an applicant record dictionary into a database-ready tuple."""
     return (
         item.get("raw_record", {}).get("id"),
         item.get("program"),
@@ -158,6 +161,7 @@ def get_database_count():
 
 
 def main():
+    """the main funciton for data loading."""
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
 
