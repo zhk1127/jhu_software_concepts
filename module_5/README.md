@@ -1,58 +1,40 @@
-# GradCafe Analytics Dashboard (Module 4)
+# GradCafe Analytics Dashboard (Module 5)
 
 ## Repository Information
 
-GitHub SSH URL
+GitHub Repository:
 
-git@github.com:zhk1127/jhu_software_concepts.git
-
-GitHub Repository
-
+```text
 https://github.com/zhk1127/jhu_software_concepts
+```
 
-Read the Docs Documentation
+GitHub SSH URL:
 
+```text
+git@github.com:zhk1127/jhu_software_concepts.git
+```
+
+Read the Docs:
+
+```text
 https://zhk1127-jhu-software-concepts.readthedocs.io/en/latest/
-
-## Project Overview
-
-This project analyzes graduate school admissions data from GradCafe using PostgreSQL and Flask. The workflow includes:
-
-1. Scraping and cleaning GradCafe application records
-2. Loading records into PostgreSQL
-3. Running SQL analytics queries
-4. Displaying results in a Flask dashboard
-5. Pulling additional records and updating the database
-6. Automated testing with pytest
-7. Continuous integration using GitHub Actions
-8. Sphinx documentation generation
-9. Read the Docs deployment
+```
 
 ---
 
-## Repository Structure
+## Project Overview
 
-```text
-module_4/
-├── src/
-│   ├── app.py
-│   ├── load_data.py
-│   ├── query_data.py
-│   └── pull_new_data.py
-├── tests/
-├── docs/
-├── .github/
-│   └── workflows/
-│       └── tests.yml
-├── requirements.txt
-├── README.md
-├── coverage_summary.txt
-├── actions_success.png
-├── limitations.pdf
-├── templates/
-├── static/
-└── screenshots/
-```
+This project analyzes GradCafe graduate admissions data using Flask and PostgreSQL. Module 5 extends the previous application by adding software assurance improvements, including environment-based database credentials, safer SQL construction, Pylint validation, and reproducible project setup.
+
+The application supports:
+
+1. Loading cleaned applicant records into PostgreSQL
+2. Running SQL analytics queries
+3. Displaying Q1–Q11 results in a Flask dashboard
+4. Pulling additional GradCafe records
+5. Updating analytics results from the web interface
+6. Running pytest with 100% coverage
+7. Running Pylint with a 10.00/10 score
 
 ---
 
@@ -61,14 +43,8 @@ module_4/
 Create and activate a virtual environment:
 
 ```bash
-python -m venv venv
-source venv/bin/activate
-```
-
-Windows:
-
-```bash
-venv\Scripts\activate
+python -m venv .venv
+source .venv/Scripts/activate
 ```
 
 Install dependencies:
@@ -76,6 +52,24 @@ Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
+
+---
+
+## Environment Variables
+
+Database credentials are loaded from environment variables rather than being hard-coded.
+
+Create a local `.env` file using `.env.example` as a template:
+
+```text
+DB_NAME=gradcafe_db
+DB_USER=your_user
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+The `.env` file is excluded from version control.
 
 ---
 
@@ -87,23 +81,11 @@ Create the database:
 CREATE DATABASE gradcafe_db;
 ```
 
-Connect to the database:
-
-```sql
-\c gradcafe_db
-```
-
-Update database credentials in the source files if necessary.
-
----
-
-## Load Initial Data
+Load initial data:
 
 ```bash
 python -m src.load_data
 ```
-
-This creates and populates the applicants table.
 
 ---
 
@@ -113,11 +95,9 @@ This creates and populates the applicants table.
 python -m src.query_data
 ```
 
-This executes all SQL analysis queries and prints answers for Questions 1–11.
-
 ---
 
-## Launch the Flask Dashboard
+## Launch Flask App
 
 ```bash
 python -m src.app
@@ -129,206 +109,88 @@ Open:
 http://127.0.0.1:5000/analysis
 ```
 
-The dashboard displays:
-
-* Current database size
-* Pull Data status
-* SQL analytics results
-
 ---
 
-## Pull New Data
-
-The **Pull Data** button:
-
-1. Determines current database size
-2. Calculates the appropriate starting GradCafe page
-3. Scrapes approximately 500 new records
-4. Cleans and standardizes records
-5. Inserts non-duplicate records into PostgreSQL
-
----
-
-## Refresh Analytics
-
-The **Update Analysis** button reruns all SQL queries and refreshes dashboard results using the latest database contents.
-
----
-
-## Automated Testing
-
-The project includes comprehensive pytest coverage for:
-
-* Flask routes
-* Database operations
-* Data loading workflows
-* Pull Data functionality
-* Analysis updates
-* Integration workflows
+## Testing
 
 Run all tests:
 
 ```bash
-python -m pytest tests
+pytest
 ```
 
 Current result:
 
 ```text
 28 passed
+Required test coverage of 100% reached.
+Total coverage: 100.00%
 ```
 
 ---
 
-## Test Coverage
+## Pylint
 
-Coverage is measured using pytest-cov.
-
-Run:
+Run Pylint on all source files:
 
 ```bash
-python -m pytest tests --cov=src --cov-report=term-missing
+pylint src
+```
+
+Verify the required score:
+
+```bash
+pylint src --fail-under=10
 ```
 
 Current result:
 
 ```text
-100% coverage
+Your code has been rated at 10.00/10
 ```
 
-Coverage proof is included in:
+Pylint is configured through the included `.pylintrc` file.
 
-```text
-coverage_summary.txt
-```
+---
+
+## SQL Injection Defenses
+
+Module 5 removes unsafe SQL string construction where dynamic SQL was needed. SQL queries use PostgreSQL parameterization and psycopg SQL composition where appropriate. Database credentials are no longer hard-coded and are loaded from environment variables.
 
 ---
 
 ## Continuous Integration
 
-GitHub Actions automatically validates every push.
-
-The workflow:
-
-1. Starts PostgreSQL
-2. Creates the database
-3. Installs dependencies
-4. Initializes test data
-5. Executes the full pytest suite
-6. Verifies coverage requirements
-
-Workflow file:
+GitHub Actions is included under:
 
 ```text
-.github/workflows/tests.yml
+.github/workflows/
 ```
 
-Proof of successful CI execution is included in:
-
-```text
-actions_success.png
-```
+The workflow validates project setup, tests, and code quality checks.
 
 ---
 
-## Documentation
+## Key Deliverables
 
-### Local Sphinx Build
+This Module 5 submission includes:
 
-Documentation source files are located in:
-
-```text
-docs/
-```
-
-Generate documentation locally:
-
-```bash
-cd docs
-python -m sphinx -b html source build/html
-```
-
-Open:
-
-```text
-docs/build/html/index.html
-```
-
-### Read the Docs
-
-Published documentation:
-
-```text
-https://zhk1127-jhu-software-concepts.readthedocs.io/en/latest/
-```
-
-The documentation includes:
-
-* Architecture overview
-* Data flow
-* ETL layer
-* Database layer
-* Analysis layer
-* Web layer
-* Testing and CI
-* Auto-generated API documentation from source code docstrings
+* `src/`
+* `tests/`
+* `requirements.txt`
+* `.env.example`
+* `.gitignore`
+* `.pylintrc`
+* `.github/workflows/`
+* `README.md`
+* `coverage_summary.txt`
+* screenshots
+* Sphinx documentation source files
 
 ---
-
-## Screenshots
-
-
-The screenshots directory contains screenshots collected during development, testing, and documentation of the GradCafe analytics application.
----
-
-## Limitations
-
-See:
-
-```text
-limitations.pdf
-```
-
-for discussion of limitations and potential biases in anonymously submitted admissions data.
-
----
-
-## Deliverables Included
-
-The following deliverables required by the assignment are included in this submission:
-
-* GitHub repository (public)
-
-* README.md
-
-* requirements.txt
-
-* coverage_summary.txt
-
-* actions_success.png
-
-* .github/workflows/tests.yml
-
-* Sphinx-generated HTML documentation under `docs/build/html`
-
-* Read the Docs deployment:
-
-  https://zhk1127-jhu-software-concepts.readthedocs.io/en/latest/
-
-* All required source files under `src/`
-
-* All required pytest test files under `tests/`
-
-* limitations.pdf
-
-The GitHub Actions workflow successfully executes the complete pytest suite and verifies 100% test coverage. Documentation is generated with Sphinx and published through Read the Docs.
-
-
 
 ## Author
 
 Hongkang Zhang
-
 Johns Hopkins University
-
-Software Concepts – Module 4
+Software Concepts – Module 5
