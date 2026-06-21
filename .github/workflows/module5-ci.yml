@@ -67,6 +67,16 @@ jobs:
           pydeps src/app.py --noshow -T svg -o dependency.svg
           test -f dependency.svg
 
+      - name: Install Snyk
+        run: npm install -g snyk
+
+      - name: Run Snyk dependency scan
+        continue-on-error: true
+        run: |
+          cd module_5
+          snyk test
+
+
       - name: Run pytest
         run: |
           cd module_5
