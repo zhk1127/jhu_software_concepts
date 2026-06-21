@@ -16,10 +16,6 @@ from dotenv import load_dotenv
 load_dotenv()
 DATA_FILE = "cleaned_applicant_data.json"
 
-DEFAULT_DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://postgres@localhost:5432/gradcafe_db",
-)
 
 def get_database_url():
     """
@@ -29,8 +25,16 @@ def get_database_url():
         str:
             Database connection string.
     """
-    return os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
+    host = os.getenv("DB_HOST", "localhost")
+    port = os.getenv("DB_PORT", "5432")
+    name = os.getenv("DB_NAME", "gradcafe_db")
+    user = os.getenv("DB_USER", "postgres")
+    password = os.getenv("DB_PASSWORD", "")
 
+    return (
+        f"postgresql://{user}:{password}"
+        f"@{host}:{port}/{name}"
+    )
 
 def get_connection():
     """Create and return a PostgreSQL database connection."""
