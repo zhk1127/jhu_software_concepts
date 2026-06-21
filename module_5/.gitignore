@@ -20,11 +20,13 @@ htmlcov/
 
 # Sphinx build output
 docs/build/
+docs/source/_autosummary/
 
-# Python cache
-__pycache__/
+# Packaging artifacts
+*.egg-info/
+dist/
+build/
 
-docs/build/
-docs/source/_autosummary/docs/build/
+# Generated data files
 additional_applicant_data.json
 additional_cleaned_applicant_data.json

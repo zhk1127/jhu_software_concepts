@@ -86,7 +86,8 @@ def get_analysis_results():
     cur.execute("""
         SELECT COUNT(*)
         FROM applicants
-        WHERE term = 'Fall 2026';
+        WHERE term = 'Fall 2026'
+        LIMIT 1;
     """)
     results["Q1"] = f"{cur.fetchone()[0]:,} Fall 2026 entries"
 
@@ -97,7 +98,8 @@ def get_analysis_results():
             2
         )
         FROM applicants
-        WHERE us_or_international NOT IN ('American', 'Other');
+        WHERE us_or_international NOT IN ('American', 'Other')
+        LIMIT 1;
     """)
     results["Q2"] = f"{cur.fetchone()[0]}% International students"
 
@@ -108,7 +110,8 @@ def get_analysis_results():
             ROUND(AVG(CASE WHEN gre BETWEEN 260 AND 340 THEN gre END)::numeric, 2),
             ROUND(AVG(CASE WHEN gre_v BETWEEN 130 AND 170 THEN gre_v END)::numeric, 2),
             ROUND(AVG(CASE WHEN gre_aw BETWEEN 1 AND 6 THEN gre_aw END)::numeric, 2)
-        FROM applicants;
+        FROM applicants
+        LIMIT 1;
     """)
     gpa, gre, gre_v, gre_aw = cur.fetchone()
     results["Q3"] = f"GPA = {gpa}, GRE = {gre}, GRE-V = {gre_v}, GRE-AW = {gre_aw}"
@@ -121,7 +124,8 @@ def get_analysis_results():
         )
         FROM applicants
         WHERE term = 'Fall 2026'
-          AND us_or_international = 'American';
+          AND us_or_international = 'American'
+        LIMIT 1;
     """)
     results["Q4"] = f"Average GPA of American Fall 2026 applicants = {cur.fetchone()[0]}"
 
@@ -134,7 +138,8 @@ def get_analysis_results():
         )
         FROM applicants
         WHERE term = 'Fall 2026'
-          AND status = 'Accepted';
+          AND status = 'Accepted'
+        LIMIT 1;
     """)
     results["Q5"] = f"Acceptance rate for Fall 2026 = {cur.fetchone()[0]}%"
 
@@ -146,7 +151,8 @@ def get_analysis_results():
         )
         FROM applicants
         WHERE term = 'Fall 2026'
-          AND status = 'Accepted';
+          AND status = 'Accepted'
+        LIMIT 1;
     """)
     results["Q6"] = f"Average GPA of accepted Fall 2026 applicants = {cur.fetchone()[0]}"
 
@@ -155,7 +161,8 @@ def get_analysis_results():
         SELECT COUNT(*)
         FROM applicants
         WHERE program = 'Computer Science, Johns Hopkins University'
-          AND degree = 'Masters';
+          AND degree = 'Masters'
+        LIMIT 1;
     """)
     results["Q7"] = f"JHU Computer Science Master's applicants = {cur.fetchone()[0]}"
 
@@ -171,7 +178,8 @@ def get_analysis_results():
             'Computer Science, Massachusetts Institute of Technology (MIT)',
             'Computer Science, Stanford University',
             'Computer Science, Carnegie Mellon University'
-          );
+          )
+        LIMIT 1;
     """)
     q8 = cur.fetchone()[0]
     results["Q8"] = (
