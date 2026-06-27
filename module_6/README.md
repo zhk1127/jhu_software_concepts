@@ -1,345 +1,205 @@
-# GradCafe Analytics Dashboard (Module 5)
+# Module 6: RabbitMQ-Based Asynchronous Microservice Architecture
 
-## Repository Information
+## Overview
 
-GitHub Repository:
+Module 6 extends the GradCafe analytics platform by introducing an asynchronous microservice architecture using RabbitMQ. Instead of executing long-running tasks directly within the Flask application, the web service publishes tasks to a message queue and a dedicated worker service processes them asynchronously.
+
+The system consists of four major services:
+
+* **Web Service (Flask)**: User interface and task publisher
+* **Worker Service**: Background task consumer and executor
+* **RabbitMQ Service**: Message broker and task queue
+* **PostgreSQL Service**: Persistent data storage
+
+The architecture improves scalability, responsiveness, and separation of concerns. RabbitMQ decouples the web application from long-running data processing tasks, allowing the user interface to remain responsive while background jobs execute asynchronously.
+
+---
+
+## Microservice Architecture
 
 ```text
-https://github.com/zhk1127/jhu_software_concepts
-```
-
-GitHub SSH URL:
-
-```text
-git@github.com:zhk1127/jhu_software_concepts.git
-```
-
-Read the Docs:
-
-```text
-https://zhk1127-jhu-software-concepts.readthedocs.io/en/latest/
-```
-
----
-
-## Project Overview
-
-This project analyzes GradCafe graduate admissions data using Flask and PostgreSQL. Module 5 extends the previous application by adding software assurance and security improvements, including environment-based database credentials, SQL injection defenses, dependency analysis, GitHub Actions continuous integration, and reproducible project setup.
-
-The application supports:
-
-1. Loading cleaned applicant records into PostgreSQL
-2. Running SQL analytics queries (Q1–Q11)
-3. Displaying analytics results through a Flask dashboard
-4. Pulling additional GradCafe records
-5. Updating analytics results from the web interface
-6. Running automated tests with 100% coverage
-7. Running Pylint with a 10.00/10 score
-8. Generating dependency graphs
-9. Performing dependency security scanning with Snyk
-
----
-
-# Environment Setup
-
-## Option 1: Standard Python venv
-
-Create and activate a virtual environment:
-
-```bash
-python -m venv .venv
-source .venv/Scripts/activate
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Install the project package:
-
-```bash
-pip install -e .
+Browser
+    |
+    V
+Flask Web Service
+(module6-web)
+    |
+    V
+RabbitMQ Queue
+    |
+    V
+Worker Service
+(module6-worker)
+    |
+    V
+PostgreSQL Database
 ```
 
 ---
 
-## Option 2: Using uv
+## Quick Start
 
-Install uv:
+Clone the repository and start the complete microservice stack:
 
 ```bash
-pip install uv
+git clone https://github.com/zhk1127/jhu_software_concepts.git
+cd jhu_software_concepts/module_6
+docker compose up --build
 ```
 
-Create a virtual environment:
+The application will become available at:
+
+* Flask Web Application: http://localhost:8080
+* RabbitMQ Management Interface: http://localhost:15672
+
+---
+
+## Docker Images
+
+The Module 6 Docker images have been published to Docker Hub.
+
+### Web Service Image
 
 ```bash
-uv venv
-source .venv/Scripts/activate
+docker pull zhk1127/module6-web:latest
 ```
 
-Install dependencies:
+### Worker Service Image
 
 ```bash
-uv pip install -r requirements.txt
+docker pull zhk1127/module6-worker:latest
 ```
 
-Install the package:
+Docker Hub repositories:
+
+* https://hub.docker.com/r/zhk1127/module6-web
+* https://hub.docker.com/r/zhk1127/module6-worker
+
+---
+
+## Running the Application
+
+Start the entire microservice stack:
 
 ```bash
-uv pip install -e .
+docker compose up --build
+```
+
+This command launches:
+
+* PostgreSQL database
+* RabbitMQ message broker
+* Flask web service
+* Background worker service
+* Database initialization loader
+
+---
+
+## Application Access
+
+### Flask Web Application
+
+```
+http://localhost:8080
+```
+
+Available actions:
+
+* Pull Data
+* Update Analysis
+* View Analysis Results
+
+### RabbitMQ Management Interface
+
+```
+http://localhost:15672
+```
+
+For educational and local development purposes, this project uses the default RabbitMQ credentials provided by the official Docker image:
+
+```
+Username: guest
+Password: guest
 ```
 
 ---
 
-# Environment Variables
+## Asynchronous Task Processing
 
-Database credentials are loaded from environment variables rather than being hard-coded.
+Two asynchronous tasks are implemented.
 
-Create a local `.env` file using `.env.example` as a template:
+### Pull Data Task
 
-```text
-DB_NAME=gradcafe_db
-DB_USER=your_user
-DB_PASSWORD=your_password
-DB_HOST=localhost
-DB_PORT=5432
+When the user clicks **Pull Data**, the Flask application publishes:
+
+```json
+{
+  "task": "scrape_new_data"
+}
 ```
 
-The `.env` file is excluded from version control through `.gitignore`.
+The worker service:
+
+1. Receives the message
+2. Executes the scraper
+3. Cleans the data
+4. Inserts records into PostgreSQL
+5. Acknowledges the message
+
+### Update Analysis Task
+
+When the user clicks **Update Analysis**, the Flask application publishes:
+
+```json
+{
+  "task": "recompute_analytics"
+}
+```
+
+The worker service:
+
+1. Receives the message
+2. Recomputes analytical results
+3. Updates cached analysis
+4. Acknowledges the message
 
 ---
 
-# PostgreSQL Setup
+## Continuous Integration
 
-Create the database:
+GitHub Actions automatically performs:
 
-```sql
-CREATE DATABASE gradcafe_db;
-```
-
-Load initial data:
-
-```bash
-python -m src.load_data
-```
-
----
-
-# Running Analytics Queries
-
-Execute all analytical queries:
-
-```bash
-python -m src.query_data
-```
-
----
-
-# Launch Flask Application
-
-Start the Flask application:
-
-```bash
-python -m src.app
-```
-
-Open the dashboard:
-
-```text
-http://127.0.0.1:5000/analysis
-```
-
----
-
-# Testing
-
-Run all tests:
-
-```bash
-pytest
-```
-
-Current result:
-
-```text
-28 passed
-Required test coverage of 100% reached.
-Total coverage: 100.00%
-```
-
----
-
-# Pylint
-
-Run Pylint on all source files:
-
-```bash
-pylint src
-```
-
-Verify the required score:
-
-```bash
-pylint src --fail-under=10
-```
-
-Current result:
-
-```text
-Your code has been rated at 10.00/10
-```
-
-Pylint configuration is stored in:
-
-```text
-.pylintrc
-```
-
----
-
-# Dependency Graph Analysis
-
-Generate the dependency graph:
-
-```bash
-pydeps src/app.py --noshow -T svg -o dependency.svg
-```
-
-The generated `dependency.svg` visualizes relationships among project modules and external dependencies.
-
----
-
-# SQL Injection Defenses
-
-Module 5 refactors dynamic SQL usage to follow secure database programming practices.
-
-Security improvements include:
-
-* No SQL built using f-strings
-* No SQL built using string concatenation
-* No SQL built using `.format()`
-* psycopg SQL composition for dynamic SQL fragments
-* Parameterized query execution using `cursor.execute(stmt, params)`
-* Separation of SQL construction and execution
-* Query LIMIT enforcement
-* Environment-based credential management
-
-These changes prevent user input from being interpreted as executable SQL code.
-
----
-
-# Database Hardening
-
-Database credentials are stored in environment variables and are not committed to source control.
-
-The application loads configuration from `.env` files using `python-dotenv`.
-
-Sensitive information is excluded from Git tracking through `.gitignore`.
-
----
-
-# Dependency Security Scanning
-
-Run Snyk dependency scanning:
-
-```bash
-snyk test
-```
-
-Current result:
-
-```text
-Tested 50 dependencies for known issues.
-No vulnerable paths found.
-```
-
-Snyk verifies that project dependencies do not contain known security vulnerabilities.
-
----
-
-Additional static application security testing was performed using Snyk Code.
-
-# Continuous Integration
-
-GitHub Actions workflows are located under:
-
-```text
-.github/workflows/
-```
-
-The CI pipeline automatically performs:
-
-* Pytest execution
+* Dependency installation
+* PostgreSQL initialization
+* Unit testing with pytest
 * Coverage verification
-* Pylint validation (`--fail-under=10`)
-* Dependency graph generation
-* Snyk dependency scanning
+* Pylint quality checks
 
-Every push automatically triggers validation of project quality and security checks.
+All Module 4, Module 5, and Module 6 GitHub Actions workflows completed successfully.
 
----
+Current results:
 
-# Package Installation
-
-The project can be installed as an editable Python package:
-
-```bash
-pip install -e .
-```
-
-or
-
-```bash
-uv pip install -e .
-```
-
-Editable installation allows source code modifications to be immediately reflected without reinstalling the package.
+* **Pytest:** 28 tests passed
+* **Coverage:** 100%
+* **Pylint:** 10.00/10
 
 ---
 
-# Key Deliverables
+## Docker and Containerization
 
-This Module 5 submission includes:
+The application is implemented as a multi-container microservice architecture:
 
-* `src/`
-* `tests/`
-* `requirements.txt`
-* `setup.py`
-* `.env.example`
-* `.gitignore`
-* `.pylintrc`
-* `.github/workflows/`
-* `README.md`
-* `coverage_summary.txt`
-* `dependency.svg`
-* Snyk analysis screenshots
-* Sphinx documentation source files
-* Read the Docs configuration
+| Service    | Docker Image          | Responsibility                    |
+| ---------- | --------------------- | --------------------------------- |
+| Web        | module6-web           | User interface and task publisher |
+| Worker     | module6-worker        | Background task execution         |
+| RabbitMQ   | rabbitmq:3-management | Message broker                    |
+| PostgreSQL | postgres:16           | Persistent storage                |
+
+Docker Compose orchestrates the entire stack and automatically establishes networking between services.
 
 ---
 
-# Security Features Summary
+## Notes
 
-Module 5 introduces the following software assurance improvements:
-
-* Environment-based credential management
-* SQL injection defenses
-* Query LIMIT enforcement
-* Dependency graph generation
-* Pylint static analysis
-* Snyk dependency scanning
-* GitHub Actions CI validation
-* Reproducible installation using pip and uv
-
----
-
-## Author
-
-Hongkang Zhang
-
-Johns Hopkins University
-
-Software Concepts – Module 5
+The RabbitMQ credentials (`guest/guest`) are used only for local development and demonstration purposes. Production deployments should use dedicated credentials and secret management solutions.
