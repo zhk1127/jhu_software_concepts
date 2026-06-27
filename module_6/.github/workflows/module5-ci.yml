@@ -1,0 +1,80 @@
+name: Module 5 CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: gradcafe_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d gradcafe_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DB_NAME: gradcafe_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: localhost
+      DB_PORT: 5432
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz
+
+      - name: Install dependencies
+        run: |
+          cd module_5
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      - name: Initialize database
+        run: |
+          cd module_5
+          python -m src.load_data
+
+      - name: Run Pylint
+        run: |
+          cd module_5
+          pylint src --fail-under=10
+
+      - name: Generate dependency graph
+        run: |
+          cd module_5
+          pydeps src/app.py --noshow -T svg -o dependency.svg
+          test -f dependency.svg
+
+      - name: Run Snyk dependency scan
+        continue-on-error: true
+        run: |
+          cd module_5
+          snyk test
+
+
+      - name: Run pytest
+        run: |
+          cd module_5
+          pytest

@@ -1,0 +1,5 @@
+[MESSAGES CONTROL]
+disable=
+    consider-using-with,
+    no-member,
+    duplicate-code

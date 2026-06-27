@@ -1,0 +1,46 @@
+# Virtual environment
+.venv/
+
+# Environment variables / secrets
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# VS Code
+.vscode/
+
+# Sphinx build output
+docs/build/
+docs/source/_autosummary/
+
+# Packaging artifacts
+*.egg-info/
+dist/
+build/
+
+# Generated data files
+additional_applicant_data.json
+additional_cleaned_applicant_data.json
+
+# Reports and generated documents
+module_5_report.pdf
+Query Explanations.pdf
+limitations.pdf
+
+# Generated analysis artifacts
+actions_success.png
+coverage_summary.txt
+dependency.svg
+snyk-analysis.png
+
+# Screenshots
+screenshots/
