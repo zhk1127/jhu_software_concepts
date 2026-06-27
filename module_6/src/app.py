@@ -98,7 +98,7 @@ def create_app(config=None):
         try:
             publish_task("scrape_new_data", payload={})
             return jsonify({"status": "queued", "task": "scrape_new_data"}), 202
-        except Exception:
+        except RuntimeError:
             flask_app.logger.exception("Failed to publish scrape_new_data")
             return jsonify({"error": "publish_failed"}), 503
 
@@ -108,7 +108,7 @@ def create_app(config=None):
         try:
             publish_task("recompute_analytics", payload={})
             return jsonify({"status": "queued", "task": "recompute_analytics"}), 202
-        except Exception:
+        except RuntimeError:
             flask_app.logger.exception("Failed to publish recompute_analytics")
             return jsonify({"error": "publish_failed"}), 503
 

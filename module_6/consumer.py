@@ -54,7 +54,7 @@ TASK_HANDLERS = {
 }
 
 
-def callback(channel, method, properties, body):
+def callback(channel, method, _properties, body):
     """Route one RabbitMQ task message to the correct handler."""
     try:
         message = json.loads(body.decode("utf-8"))
@@ -69,7 +69,7 @@ def callback(channel, method, properties, body):
         channel.basic_ack(delivery_tag=method.delivery_tag)
         print(f"Task completed and acknowledged: {kind}", flush=True)
 
-    except Exception as exc:
+    except (ValueError, RuntimeError, pika.exceptions.AMQPError) as exc:
         print(f"Task failed: {exc}", flush=True)
         channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 

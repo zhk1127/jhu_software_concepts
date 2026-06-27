@@ -28,7 +28,12 @@ def test_analysis_page_end_to_end():
 
 
 @pytest.mark.integration
-def test_update_analysis_then_reload_page():
+def test_update_analysis_then_reload_page(monkeypatch):
+
+    monkeypatch.setattr(
+        "src.app.publish_task",
+        lambda kind, payload=None, headers=None: None,
+    )
 
     app = create_app({"TESTING": True})
 
@@ -36,7 +41,7 @@ def test_update_analysis_then_reload_page():
 
     response = client.post("/update-analysis")
 
-    assert response.status_code == 200
+    assert response.status_code == 202
 
     response = client.get("/analysis")
 

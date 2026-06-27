@@ -2,7 +2,14 @@ name: Module 4 Tests
 
 on:
   push:
+    paths:
+      - "module_4/**"
+      - ".github/workflows/tests.yml"
+
   pull_request:
+    paths:
+      - "module_4/**"
+      - ".github/workflows/tests.yml"
 
 jobs:
   test:

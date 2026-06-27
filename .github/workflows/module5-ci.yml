@@ -2,7 +2,14 @@ name: Module 5 CI
 
 on:
   push:
+    paths:
+      - "module_5/**"
+      - ".github/workflows/module5-ci.yml"
+
   pull_request:
+    paths:
+      - "module_5/**"
+      - ".github/workflows/module5-ci.yml"
 
 jobs:
   test:
