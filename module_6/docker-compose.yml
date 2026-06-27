@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: gradcafe
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gradcafe"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  loader:
+    build: .
+    command: python -m src.load_data
+    environment:
+      DB_HOST: db
+      DB_NAME: gradcafe
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: .
+    environment:
+      DB_HOST: db
+      DB_NAME: gradcafe
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+    ports:
+      - "5000:5000"
+    depends_on:
+      loader:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:
