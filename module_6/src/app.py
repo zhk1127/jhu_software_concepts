@@ -6,10 +6,10 @@ dashboard, launches background data pulls, and refreshes SQL
 analysis results stored in PostgreSQL.
 """
 
-import subprocess
 import sys
 
 from flask import Flask, jsonify, redirect, render_template, url_for
+from publisher import publish_task
 from src.load_data import get_database_count
 from src.query_data import get_analysis_results
 
@@ -94,23 +94,23 @@ def create_app(config=None):
 
     @flask_app.route("/pull-data", methods=["POST"])
     def pull_data():
-        """Start a background data pull if one is not already running."""
-        if pull_running():
-            return jsonify({"busy": True}), 409
-
-        process = subprocess.Popen(flask_app.config["SCRAPER_COMMAND"])
-        flask_app.config["PULL_PROCESS"] = process
-
-        return jsonify({"ok": True}), 200
+        """Queue a background data pull task."""
+        try:
+            publish_task("scrape_new_data", payload={})
+            return jsonify({"status": "queued", "task": "scrape_new_data"}), 202
+        except Exception:
+            flask_app.logger.exception("Failed to publish scrape_new_data")
+            return jsonify({"error": "publish_failed"}), 503
 
     @flask_app.route("/update-analysis", methods=["POST"])
     def update_analysis():
-        """Refresh cached analysis results if no data pull is running."""
-        if pull_running():
-            return jsonify({"busy": True}), 409
-
-        flask_app.config["CACHED_RESULTS"] = get_analysis_results()
-        return jsonify({"ok": True}), 200
+        """Queue an analytics recompute task."""
+        try:
+            publish_task("recompute_analytics", payload={})
+            return jsonify({"status": "queued", "task": "recompute_analytics"}), 202
+        except Exception:
+            flask_app.logger.exception("Failed to publish recompute_analytics")
+            return jsonify({"error": "publish_failed"}), 503
 
     return flask_app
 

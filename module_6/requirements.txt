@@ -8,3 +8,4 @@ beautifulsoup4
 sphinx
 sphinx-rtd-theme
 pydeps
+pika

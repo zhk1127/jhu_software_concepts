@@ -15,6 +15,17 @@ services:
       timeout: 3s
       retries: 10
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   loader:
     build: .
     command: python -m src.load_data
@@ -36,11 +47,30 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_PORT: 5432
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
     ports:
       - "5000:5000"
     depends_on:
       loader:
         condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: python consumer.py
+    environment:
+      DB_HOST: db
+      DB_NAME: gradcafe
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
 volumes:
   pgdata:
