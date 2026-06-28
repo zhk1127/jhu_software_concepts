@@ -1,3 +1,5 @@
+"""Clean and normalize GradCafe applicant records for database loading."""
+
 import json
 import re
 import html as html_lib
@@ -9,16 +11,19 @@ LOG_FILE = "cleaning_log.txt"
 
 
 def load_data(filename=INPUT_FILE):
+    """Load JSON applicant records from disk."""
     with open(filename, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def save_data(data, filename=OUTPUT_FILE):
+    """Save cleaned applicant records to disk as JSON."""
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
 def clean_text(value):
+    """Normalize text values and remove empty placeholders."""
     if value is None:
         return None
 
@@ -31,6 +36,7 @@ def clean_text(value):
 
 
 def extract_gpa_from_comments(comments):
+    """Extract a GPA value from free-text comments when available."""
     if not comments:
         return None
 
@@ -49,6 +55,7 @@ def extract_gpa_from_comments(comments):
 
 
 def make_llm_program_field(program, university):
+    """Create a normalized program field for LLM-enhanced records."""
     program = clean_text(program)
     university = clean_text(university)
 
@@ -63,6 +70,7 @@ def make_llm_program_field(program, university):
 
 
 def clean_record(record):
+    """Clean and normalize a single applicant record."""
     cleaned = record.copy()
 
     original_program = record.get("program")
@@ -89,16 +97,18 @@ def clean_record(record):
     return cleaned
 
 
-def clean_data(records):
-    return [clean_record(record) for record in records]
+def clean_data(input_records):
+    """Clean a collection of applicant records."""
+    return [clean_record(record) for record in input_records]
 
 
-def write_log(original_records, cleaned_records, filename=LOG_FILE):
+def write_log(original_records, output_records, filename=LOG_FILE):
+    """Write a cleaning summary log to disk."""
     comment_change_count = 0
     missing_gpa_found_count = 0
     examples = []
 
-    for original, cleaned in zip(original_records, cleaned_records):
+    for original, cleaned in zip(original_records, output_records):
         if original.get("comments") != cleaned.get("comments"):
             comment_change_count += 1
 
@@ -114,8 +124,8 @@ def write_log(original_records, cleaned_records, filename=LOG_FILE):
         f.write("Cleaning Log\n")
         f.write("============\n\n")
         f.write(f"Input records: {len(original_records)}\n")
-        f.write(f"Output records: {len(cleaned_records)}\n")
-        f.write(f"Records prepared for LLM input: {len(cleaned_records)}\n")
+        f.write(f"Output records: {len(output_records)}\n")
+        f.write(f"Records prepared for LLM input: {len(output_records)}\n")
         f.write(f"Comment fields changed by text cleaning: {comment_change_count}\n")
         f.write(
             "Missing GPA values found in comments by regex: "
@@ -148,13 +158,13 @@ def write_log(original_records, cleaned_records, filename=LOG_FILE):
             f.write("\n")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     records = load_data()
-    cleaned_records = clean_data(records)
+    cleaned_output = clean_data(records)
 
-    save_data(cleaned_records)
-    write_log(records, cleaned_records)
+    save_data(cleaned_output)
+    write_log(records, cleaned_output)
 
     print(f"Loaded {len(records)} records.")
-    print(f"Saved {len(cleaned_records)} records to {OUTPUT_FILE}")
+    print(f"Saved {len(cleaned_output)} records to {OUTPUT_FILE}")
     print(f"Wrote cleaning summary to {LOG_FILE}")

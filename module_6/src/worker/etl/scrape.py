@@ -1,3 +1,5 @@
+"""Scrape GradCafe applicant records for incremental worker ingestion."""
+
 import json
 import time
 import html as html_lib
@@ -20,6 +22,7 @@ http = urllib3.PoolManager()
 
 
 def build_url(page=1):
+    """Build the GradCafe results URL for a page number."""
     params = {
         "page": page,
         "sort": "newest",
@@ -28,6 +31,7 @@ def build_url(page=1):
 
 
 def fetch_page(page=1):
+    """Fetch a GradCafe HTML page."""
     url = build_url(page)
 
     response = http.request(
@@ -45,10 +49,11 @@ def fetch_page(page=1):
 
 
 def fetch_page_with_retries(page=1):
+    """Fetch a page with retry handling for transient failures."""
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             return fetch_page(page)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Page {page} failed attempt {attempt}/{MAX_RETRIES}: {e}")
 
             if attempt < MAX_RETRIES:
@@ -60,6 +65,7 @@ def fetch_page_with_retries(page=1):
 
 
 def extract_results_from_html(html_text):
+    """Extract applicant result records from GradCafe HTML."""
     soup = BeautifulSoup(html_text, "html.parser")
     app_div = soup.find("div", id="app")
 
@@ -78,6 +84,7 @@ def extract_results_from_html(html_text):
 
 
 def clean_record(record):
+    """Convert a scraped HTML record into a normalized dictionary."""
     result_id = record.get("id")
 
     return {
@@ -103,11 +110,13 @@ def clean_record(record):
 
 
 def save_data(data, filename=OUTPUT_FILE):
+    """Save scraped applicant records to disk as JSON."""
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
 def load_data(filename=OUTPUT_FILE):
+    """Load scraped applicant records from disk."""
     try:
         with open(filename, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -115,11 +124,12 @@ def load_data(filename=OUTPUT_FILE):
         return []
 
 
-def _deduplicate_by_url(records):
+def _deduplicate_by_url(input_records):
+    """Remove duplicate records using the applicant URL."""
     seen = set()
     unique_records = []
 
-    for record in records:
+    for record in input_records:
         url = record.get("url")
 
         if url in seen:
@@ -132,6 +142,7 @@ def _deduplicate_by_url(records):
 
 
 def scrape_data(target_records=TARGET_RECORDS):
+    """Scrape applicant records across GradCafe result pages."""
     all_records = load_data()
     all_records = _deduplicate_by_url(all_records)
 
@@ -184,7 +195,7 @@ def scrape_data(target_records=TARGET_RECORDS):
     return all_records
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     records = scrape_data()
     save_data(records)
     print(f"Saved {len(records)} records to {OUTPUT_FILE}")

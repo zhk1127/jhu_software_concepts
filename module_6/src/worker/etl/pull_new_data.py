@@ -8,22 +8,20 @@ the applicants database while avoiding duplicates.
 import os
 import json
 import time
-import sys
 
 import psycopg
 
 from dotenv import load_dotenv
 
 from src.db.load_data import get_watermark, update_watermark
-from module_2_code.scrape import (
+from src.worker.etl.scrape import (
     fetch_page_with_retries,
     extract_results_from_html,
     clean_record,
 )
-from module_2_code.clean import clean_data
+from src.worker.etl.clean import clean_data
 
 load_dotenv()
-sys.path.append("module_2_code")
 
 TARGET_RECORDS = 500
 RECORDS_PER_PAGE = 20
