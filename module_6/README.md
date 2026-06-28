@@ -48,8 +48,6 @@ module_6/
 ├── setup.py
 ├── pytest.ini
 ├── .env.example
-├── static/
-├── templates/
 ├── docs/
 ├── tests/
 │   ├── test_analysis_format.py
