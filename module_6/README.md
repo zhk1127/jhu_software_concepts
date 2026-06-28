@@ -57,7 +57,10 @@ module_6/
 │   ├── test_db_insert.py
 │   ├── test_flask_page.py
 │   ├── test_integration_end_to_end.py
-│   └── test_publisher.py
+│   ├── test_publisher.py
+|   ├── test_clean.py
+|   ├── test_scrape.py
+|   └── test_pull_new_data_transaction.py
 │
 ├── src/
 │   ├── data/
@@ -80,6 +83,8 @@ module_6/
 │       ├── consumer.py
 │       └── etl/
 │           ├── pull_new_data.py
+│           ├── clean.py
+│           ├── scrape.py
 │           └── query_data.py
 ```
 
