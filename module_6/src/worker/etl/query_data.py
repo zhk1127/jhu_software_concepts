@@ -6,7 +6,6 @@ returns formatted answers for Questions 1–11 used by
 the Flask dashboard and assignment analysis.
 """
 import os
-import json
 import psycopg
 from dotenv import load_dotenv
 from psycopg import sql
@@ -21,52 +20,53 @@ DB_CONFIG = {
     "port": os.getenv("DB_PORT", "5432"),
 }
 
-LLM_FILE = "llm_extend_applicant_data_full.jsonl"
-
 
 def get_llm_q9_count():
     """
     Count accepted Computer Science PhD applicants using
-    LLM-generated university and program annotations.
+    LLM-generated university and program annotations
+    stored in PostgreSQL.
 
     Returns:
         int:
             Number of matching applicants.
     """
-    target_universities = {
+    target_universities = [
         "Georgetown University",
         "Massachusetts Institute of Technology",
         "MIT",
         "Stanford University",
         "Carnegie Mellon University",
-    }
+    ]
 
-    count = 0
+    conn = psycopg.connect(**DB_CONFIG)
+    cur = conn.cursor()
 
-    with open(LLM_FILE, "r", encoding="utf-8") as f:
-        for line in f:
-            if not line.strip():
-                continue
+    cur.execute(
+        """
+        SELECT COUNT(*)
+        FROM applicants
+        WHERE status = %s
+          AND degree = %s
+          AND term LIKE %s
+          AND LOWER(llm_generated_program) = %s
+          AND llm_generated_university = ANY(%s)
+        """,
+        (
+            "Accepted",
+            "PhD",
+            "%2026%",
+            "computer science",
+            target_universities,
+        ),
+    )
 
-            item = json.loads(line)
+    count = cur.fetchone()[0]
 
-            status = item.get("status")
-            term = item.get("term")
-            degree = item.get("Degree")
-            llm_program = item.get("llm-generated-program") or ""
-            llm_university = item.get("llm-generated-university") or ""
-
-            if (
-                status == "Accepted"
-                and degree == "PhD"
-                and "2026" in str(term)
-                and llm_program.lower() == "computer science"
-                and llm_university in target_universities
-            ):
-                count += 1
+    cur.close()
+    conn.close()
 
     return count
-
 
 def get_analysis_results():
     """

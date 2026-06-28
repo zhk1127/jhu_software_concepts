@@ -37,18 +37,30 @@ from src.worker.etl import query_data
 
 
 @pytest.mark.analysis
-def test_get_llm_q9_count_skips_blank_lines(monkeypatch, tmp_path):
-    fake_file = tmp_path / "fake_llm.jsonl"
+def test_get_llm_q9_count(monkeypatch):
 
-    fake_file.write_text(
-        '\n'
-        '{"status": "Accepted", "term": "Fall 2026", "Degree": "PhD", '
-        '"llm-generated-program": "Computer Science", '
-        '"llm-generated-university": "MIT"}\n',
-        encoding="utf-8",
+    class FakeCursor:
+        def execute(self, *args, **kwargs):
+            pass
+
+        def fetchone(self):
+            return (1,)
+
+        def close(self):
+            pass
+
+    class FakeConnection:
+        def cursor(self):
+            return FakeCursor()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(
+        query_data.psycopg,
+        "connect",
+        lambda **kwargs: FakeConnection(),
     )
-
-    monkeypatch.setattr(query_data, "LLM_FILE", str(fake_file))
 
     assert query_data.get_llm_q9_count() == 1
 

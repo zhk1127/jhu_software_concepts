@@ -261,35 +261,65 @@ The `recompute_analytics` task is also processed asynchronously through RabbitMQ
 
 ## Docker Images
 
-The application images were successfully built, tagged, and published to Docker Hub.
+The application images were successfully built, tagged, and published to a public Docker Hub repository named `module_6`.
 
-### Web Service
-
-```bash
-docker pull zhk1127/module6-web:latest
-```
-
-Docker Hub:
+### Docker Hub Repository
 
 ```text
-https://hub.docker.com/r/zhk1127/module6-web
+https://hub.docker.com/r/zhk1127/module_6
 ```
 
----
-
-### Worker Service
+### Pull the Web Service Image
 
 ```bash
-docker pull zhk1127/module6-worker:latest
+docker pull zhk1127/module_6:web
 ```
 
-Docker Hub:
+### Pull the Worker Service Image
+
+```bash
+docker pull zhk1127/module_6:worker
+```
+
+### Inspect Available Image Tags
+
+```bash
+docker pull zhk1127/module_6:web
+docker pull zhk1127/module_6:worker
+```
+
+The Docker Hub repository contains two published images:
+
+| Tag      | Description                                     |
+| -------- | ----------------------------------------------- |
+| `web`    | Flask web service and RabbitMQ publisher        |
+| `worker` | RabbitMQ consumer and background task processor |
+
+### Run the Complete Application Stack
+
+The recommended deployment method is Docker Compose:
+
+```bash
+git clone https://github.com/zhk1127/jhu_software_concepts.git
+cd jhu_software_concepts/module_6
+docker compose up --build
+```
+
+After startup, the following services become available:
+
+| Service                | URL                    |
+| ---------------------- | ---------------------- |
+| Flask Web Application  | http://localhost:8080  |
+| RabbitMQ Management UI | http://localhost:15672 |
+
+RabbitMQ credentials:
 
 ```text
-https://hub.docker.com/r/zhk1127/module6-worker
+Username: guest
+Password: guest
 ```
 
----
+The Docker Hub repository is provided both to satisfy the image publishing requirement and to allow independent inspection and execution of the web and worker microservices.
 
 ## Continuous Integration
 
@@ -309,25 +339,23 @@ All Module 4, Module 5, and Module 6 GitHub Actions workflows completed successf
 
 | Validation            | Result          |
 | --------------------- | --------------- |
-| Pytest                | 30 tests passed |
+| Pytest                | 57 tests passed |
 | Coverage              | 100.00%         |
 | Pylint                | 10.00 / 10      |
 | Docker Compose        | Passed          |
 | RabbitMQ Messaging    | Passed          |
 | Docker Hub Publishing | Passed          |
 | GitHub Actions        | Passed          |
-
 ---
 
 ## Docker Containers
 
-| Service    | Image                 | Responsibility                    |
-| ---------- | --------------------- | --------------------------------- |
-| Web        | module6-web           | User interface and task publisher |
-| Worker     | module6-worker        | Background task execution         |
-| RabbitMQ   | rabbitmq:3-management | Message broker                    |
-| PostgreSQL | postgres:16           | Persistent storage                |
-
+| Service    | Image                    | Responsibility                    |
+| ---------- | ------------------------ | --------------------------------- |
+| Web        | zhk1127/module_6:web     | User interface and task publisher |
+| Worker     | zhk1127/module_6:worker  | Background task execution         |
+| RabbitMQ   | rabbitmq:3-management    | Message broker                    |
+| PostgreSQL | postgres:16              | Persistent storage                |
 Docker Compose automatically creates networking and service dependencies among all containers.
 
 ---
