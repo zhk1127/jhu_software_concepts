@@ -1,6 +1,6 @@
 import pytest
 
-from src import load_data
+from src.db import load_data
 
 
 TEST_ID =  "999999001"
@@ -91,7 +91,7 @@ def test_get_database_count_returns_integer():
     assert isinstance(count, int)
     assert count >= 0
 
-from src import pull_new_data
+from src.worker.etl import pull_new_data
 
 
 @pytest.mark.db

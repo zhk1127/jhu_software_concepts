@@ -14,7 +14,7 @@ import psycopg
 from dotenv import load_dotenv
 
 load_dotenv()
-DATA_FILE = "cleaned_applicant_data.json"
+DATA_FILE = "src/data/cleaned_applicant_data.json"
 
 
 def get_database_url():

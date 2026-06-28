@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from src.app import create_app
+from src.web.app.app import create_app
 
 
 @pytest.mark.analysis
@@ -33,7 +33,7 @@ def test_percentages_are_rendered_with_two_decimals():
     for percentage in percentages:
         assert re.match(r"^\d+\.\d{2}%$", percentage)
 
-from src import query_data
+from src.worker.etl import query_data
 
 
 @pytest.mark.analysis
@@ -53,7 +53,7 @@ def test_get_llm_q9_count_skips_blank_lines(monkeypatch, tmp_path):
     assert query_data.get_llm_q9_count() == 1
 
 import runpy
-from src import query_data
+from src.worker.etl import query_data
 
 @pytest.mark.analysis
 def test_query_data_main(monkeypatch):
@@ -65,6 +65,6 @@ def test_query_data_main(monkeypatch):
     )
 
     runpy.run_module(
-        "src.query_data",
+        "src.worker.etl.query_data",
         run_name="__main__"
     )

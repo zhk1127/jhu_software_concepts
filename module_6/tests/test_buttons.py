@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.app import create_app
+from src.web.app.app import create_app
 
 
 @pytest.mark.buttons
@@ -14,7 +14,7 @@ def test_pull_data_endpoint_queues_task(monkeypatch):
     def fake_publish_task(kind, payload=None, headers=None):
         calls.append((kind, payload, headers))
 
-    monkeypatch.setattr("src.app.publish_task", fake_publish_task)
+    monkeypatch.setattr("src.web.app.app.publish_task", fake_publish_task)
 
     app = create_app({"TESTING": True})
     client = app.test_client()
@@ -38,7 +38,7 @@ def test_update_analysis_endpoint_queues_task(monkeypatch):
     def fake_publish_task(kind, payload=None, headers=None):
         calls.append((kind, payload, headers))
 
-    monkeypatch.setattr("src.app.publish_task", fake_publish_task)
+    monkeypatch.setattr("src.web.app.app.publish_task", fake_publish_task)
 
     app = create_app({"TESTING": True})
     client = app.test_client()
@@ -60,7 +60,7 @@ def test_pull_data_returns_503_when_publish_fails(monkeypatch):
     def fake_publish_task(kind, payload=None, headers=None):
         raise RuntimeError("RabbitMQ unavailable")
 
-    monkeypatch.setattr("src.app.publish_task", fake_publish_task)
+    monkeypatch.setattr("src.web.app.app.publish_task", fake_publish_task)
 
     app = create_app({"TESTING": True})
     client = app.test_client()
@@ -78,7 +78,7 @@ def test_update_analysis_returns_503_when_publish_fails(monkeypatch):
     def fake_publish_task(kind, payload=None, headers=None):
         raise RuntimeError("RabbitMQ unavailable")
 
-    monkeypatch.setattr("src.app.publish_task", fake_publish_task)
+    monkeypatch.setattr("src.web.app.app.publish_task", fake_publish_task)
 
     app = create_app({"TESTING": True})
     client = app.test_client()

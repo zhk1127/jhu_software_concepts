@@ -6,8 +6,8 @@ import time
 
 import pika
 
-from src import pull_new_data
-from src.query_data import get_analysis_results
+from src.worker.etl import pull_new_data
+from src.worker.etl.query_data import get_analysis_results
 
 EXCHANGE = "tasks"
 QUEUE = "tasks_q"

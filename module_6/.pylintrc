@@ -3,3 +3,5 @@ disable=
     consider-using-with,
     no-member,
     duplicate-code
+[MASTER]
+init-hook='import sys, os; sys.path.insert(0, os.getcwd())'

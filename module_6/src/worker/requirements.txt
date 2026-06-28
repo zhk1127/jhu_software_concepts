@@ -1,0 +1,11 @@
+flask
+psycopg[binary]
+python-dotenv
+pytest
+pytest-cov
+pylint
+beautifulsoup4
+sphinx
+sphinx-rtd-theme
+pydeps
+pika

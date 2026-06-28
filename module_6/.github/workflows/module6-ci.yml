@@ -57,7 +57,7 @@ jobs:
       - name: Initialize database
         run: |
           cd module_6
-          python -m src.load_data
+          python -m src.db.load_data
 
       - name: Run pytest
         run: |

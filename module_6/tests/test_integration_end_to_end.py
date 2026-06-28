@@ -1,6 +1,6 @@
 import pytest
 
-from src.app import create_app
+from src.web.app.app import create_app
 
 
 @pytest.mark.integration
@@ -31,7 +31,7 @@ def test_analysis_page_end_to_end():
 def test_update_analysis_then_reload_page(monkeypatch):
 
     monkeypatch.setattr(
-        "src.app.publish_task",
+        "src.web.app.app.publish_task",
         lambda kind, payload=None, headers=None: None,
     )
 
@@ -53,7 +53,7 @@ def test_update_analysis_then_reload_page(monkeypatch):
 
     assert "Answer:" in html
 
-from src import pull_new_data
+from src.worker.etl import pull_new_data
 
 
 @pytest.mark.integration

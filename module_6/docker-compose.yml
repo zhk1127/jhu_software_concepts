@@ -28,7 +28,7 @@ services:
 
   loader:
     build: .
-    command: python -m src.load_data
+    command: python -m src.db.load_data
     environment:
       DB_HOST: db
       DB_NAME: gradcafe
@@ -41,6 +41,7 @@ services:
 
   web:
     build: .
+    command: python -m src.web.run
     environment:
       DB_HOST: db
       DB_NAME: gradcafe
@@ -58,7 +59,7 @@ services:
 
   worker:
     build: .
-    command: python consumer.py
+    command: python -m src.worker.consumer
     environment:
       DB_HOST: db
       DB_NAME: gradcafe
