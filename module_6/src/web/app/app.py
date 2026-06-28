@@ -11,8 +11,6 @@ def create_app(config=None):
     """Create and configure the Flask application."""
     flask_app = Flask(
         __name__,
-        template_folder="../../../templates",
-        static_folder="../../../static",
     )
 
     flask_app.config.update(

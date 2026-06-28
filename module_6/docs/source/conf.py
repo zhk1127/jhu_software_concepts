@@ -9,7 +9,6 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath("../.."))
-sys.path.insert(0, os.path.abspath("../../module_2_code"))
 
 project = 'JHU Software Concepts Module 5'
 copyright = '2026, Hongkang Zhang'

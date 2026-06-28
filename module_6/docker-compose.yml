@@ -27,7 +27,9 @@ services:
       retries: 10
 
   loader:
-    build: .
+    build:
+      context: .
+      dockerfile: src/web/Dockerfile
     command: python -m src.db.load_data
     environment:
       DB_HOST: db
@@ -40,7 +42,9 @@ services:
         condition: service_healthy
 
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: src/web/Dockerfile
     command: python -m src.web.run
     environment:
       DB_HOST: db
@@ -58,7 +62,9 @@ services:
         condition: service_healthy
 
   worker:
-    build: .
+    build:
+      context: .
+      dockerfile: src/worker/Dockerfile
     command: python -m src.worker.consumer
     environment:
       DB_HOST: db
