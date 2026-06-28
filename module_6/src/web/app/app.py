@@ -23,12 +23,6 @@ def create_app(config=None):
     if config:
         flask_app.config.update(config)
 
-    def get_cached_results():
-        """Return cached analysis results, computing them if needed."""
-        if flask_app.config.get("CACHED_RESULTS") is None:
-            flask_app.config["CACHED_RESULTS"] = get_analysis_results()
-        return flask_app.config["CACHED_RESULTS"]
-
     @flask_app.route("/")
     def home():
         """Redirect the home page to the analysis dashboard."""
@@ -45,7 +39,7 @@ def create_app(config=None):
 
         return render_template(
             "index.html",
-            results=get_cached_results(),
+            results=get_analysis_results(),
             database_count=get_database_count(),
             pull_running=False,
             pull_status=pull_status,

@@ -3,7 +3,7 @@ Load cleaned GradCafe applicant records into PostgreSQL.
 
 This module creates the applicants table, loads applicant
 records from JSON files, and provides helper functions for
-database access and record conversion.
+database access, record conversion, and ingestion watermarks.
 """
 import json
 import os
@@ -18,23 +18,15 @@ DATA_FILE = "src/data/cleaned_applicant_data.json"
 
 
 def get_database_url():
-    """
-    Return the PostgreSQL connection URL.
-
-    Returns:
-        str:
-            Database connection string.
-    """
+    """Return the PostgreSQL connection URL."""
     host = os.getenv("DB_HOST", "localhost")
     port = os.getenv("DB_PORT", "5432")
     name = os.getenv("DB_NAME", "gradcafe_db")
     user = os.getenv("DB_USER", "postgres")
     password = os.getenv("DB_PASSWORD", "")
 
-    return (
-        f"postgresql://{user}:{password}"
-        f"@{host}:{port}/{name}"
-    )
+    return f"postgresql://{user}:{password}@{host}:{port}/{name}"
+
 
 def get_connection():
     """Create and return a PostgreSQL database connection."""
@@ -42,9 +34,7 @@ def get_connection():
 
 
 def create_table():
-    """
-    Create the applicants table if it does not already exist.
-    """
+    """Create required database tables if they do not already exist."""
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -65,6 +55,16 @@ def create_table():
                     degree TEXT,
                     llm_generated_program TEXT,
                     llm_generated_university TEXT
+                );
+                """
+            )
+
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS ingestion_watermarks (
+                    source TEXT PRIMARY KEY,
+                    last_seen INTEGER,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
                 """
             )
@@ -112,19 +112,7 @@ def record_to_tuple(item):
 
 
 def load_records(data):
-    """
-    Insert applicant records into PostgreSQL.
-
-    Duplicate records are ignored using ON CONFLICT.
-
-    Args:
-        data (list):
-            List of cleaned applicant records.
-
-    Returns:
-        int:
-            Number of records inserted.
-    """
+    """Insert applicant records into PostgreSQL with idempotent conflict handling."""
     create_table()
 
     insert_sql = """
@@ -149,13 +137,7 @@ def load_records(data):
 
 
 def get_database_count():
-    """
-    Return the total number of records in the applicants table.
-
-    Returns:
-        int:
-            Number of applicant records.
-    """
+    """Return the total number of records in the applicants table."""
     create_table()
 
     with get_connection() as conn:
@@ -164,14 +146,56 @@ def get_database_count():
             return cur.fetchone()[0]
 
 
+def get_watermark(source="gradcafe"):
+    """Return the current ingestion watermark for a source."""
+    create_table()
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT last_seen
+                FROM ingestion_watermarks
+                WHERE source = %s;
+                """,
+                (source,),
+            )
+            row = cur.fetchone()
+
+    return row[0] if row else 0
+
+
+def update_watermark(last_seen, source="gradcafe"):
+    """Insert or update the ingestion watermark for a source."""
+    create_table()
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO ingestion_watermarks (source, last_seen)
+                VALUES (%s, %s)
+                ON CONFLICT (source)
+                DO UPDATE SET
+                    last_seen = EXCLUDED.last_seen,
+                    updated_at = CURRENT_TIMESTAMP;
+                """,
+                (source, last_seen),
+            )
+
+
 def main():
-    """the main funciton for data loading."""
+    """Load the initial cleaned applicant dataset."""
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     inserted = load_records(data)
+    current_count = get_database_count()
+    update_watermark(current_count)
+
     print(f"Inserted {inserted} new records into applicants table.")
+    print(f"Updated ingestion watermark to {current_count}.")
 
 
-if __name__ == "__main__": # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main()

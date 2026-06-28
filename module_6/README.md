@@ -4,7 +4,7 @@
 
 Module 6 extends the GradCafe analytics platform by introducing an asynchronous microservice architecture using RabbitMQ. Instead of executing long-running tasks directly within the Flask web application, tasks are published to a RabbitMQ message queue and processed asynchronously by a dedicated worker service.
 
-This architecture improves responsiveness, scalability, and separation of concerns by decoupling user interactions from computationally intensive background operations.
+This architecture improves responsiveness, scalability, fault tolerance, and separation of concerns by decoupling user interactions from computationally intensive background operations.
 
 The system consists of four primary services:
 
@@ -84,6 +84,7 @@ module_6/
 ```
 
 ---
+
 ## Local Python Environment (Optional)
 
 For local development and testing, a Python virtual environment can be created as follows:
@@ -106,6 +107,7 @@ The `.venv` directory is intentionally excluded from the repository. All require
 
 For final validation and deployment, Docker Compose is the recommended and reference execution environment.
 
+---
 
 ## Quick Start
 
@@ -179,7 +181,7 @@ These credentials are used only for local development and demonstration purposes
 
 ### Pull Data Task
 
-When the user clicks **Pull Data**, the web service publishes a message to RabbitMQ:
+When the user clicks **Pull Data**, the web service publishes:
 
 ```json
 {
@@ -211,8 +213,49 @@ The worker service:
 
 1. Consumes the message
 2. Recomputes analytical results
-3. Updates cached analysis
+3. Refreshes analytics using the latest PostgreSQL state
 4. Acknowledges the message
+
+---
+
+## Incremental Loading and Idempotent Updates
+
+To support reliable asynchronous ingestion, Module 6 implements an incremental loading mechanism using a PostgreSQL `ingestion_watermarks` table.
+
+### Watermark Tracking
+
+The `ingestion_watermarks` table stores the latest successfully processed position for each data source:
+
+```sql
+CREATE TABLE ingestion_watermarks (
+    source TEXT PRIMARY KEY,
+    last_seen INTEGER NOT NULL
+);
+```
+
+During each `scrape_new_data` task:
+
+1. The worker reads the current watermark from PostgreSQL.
+2. The scraper calculates the next GradCafe page to process.
+3. New records are scraped and cleaned.
+4. Records are inserted into PostgreSQL.
+5. After successful insertion, the watermark is advanced.
+
+This mechanism enables incremental processing and prevents unnecessary reprocessing of previously ingested records.
+
+### Idempotent Inserts
+
+To guarantee idempotent behavior, PostgreSQL inserts use:
+
+```sql
+ON CONFLICT DO NOTHING
+```
+
+This ensures that duplicate records are safely ignored and repeated task execution does not create duplicate database entries.
+
+### Analytics Updates
+
+The `recompute_analytics` task is also processed asynchronously through RabbitMQ. The worker recomputes analytical summaries, and the Flask UI displays analytics generated from the latest PostgreSQL-backed state.
 
 ---
 
@@ -264,8 +307,6 @@ All Module 4, Module 5, and Module 6 GitHub Actions workflows completed successf
 
 ## Validation Results
 
-Final validation results:
-
 | Validation            | Result          |
 | --------------------- | --------------- |
 | Pytest                | 30 tests passed |
@@ -296,5 +337,7 @@ Docker Compose automatically creates networking and service dependencies among a
 * RabbitMQ uses durable queues and persistent messages.
 * Worker consumers use `basic_qos(prefetch_count=1)`.
 * Messages are acknowledged only after successful task completion.
+* PostgreSQL uses incremental ingestion watermarks.
+* Database inserts are idempotent via `ON CONFLICT DO NOTHING`.
 * Docker images are publicly available on Docker Hub.
 * The system was validated locally, through Docker Compose orchestration, and through GitHub Actions continuous integration.

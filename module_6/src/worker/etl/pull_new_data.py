@@ -13,6 +13,8 @@ import sys
 import psycopg
 
 from dotenv import load_dotenv
+
+from src.db.load_data import get_watermark, update_watermark
 from module_2_code.scrape import (
     fetch_page_with_retries,
     extract_results_from_html,
@@ -67,26 +69,11 @@ def save_json(data, filename):
 
 
 def get_start_page():
-    """
-    Calculate the GradCafe page number used as the starting
-    point for incremental scraping.
+    """Return starting GradCafe page based on ingestion watermark."""
+    last_seen = get_watermark()
+    start_page = last_seen // RECORDS_PER_PAGE + 50
 
-    Returns:
-        int:
-            Starting page number.
-    """
-    conn = psycopg.connect(**DB_CONFIG)
-    cur = conn.cursor()
-
-    cur.execute("SELECT COUNT(*) FROM applicants;")
-    record_count = cur.fetchone()[0]
-
-    cur.close()
-    conn.close()
-
-    start_page = record_count // RECORDS_PER_PAGE + 50
-
-    print(f"Current database records: {record_count}", flush=True)
+    print(f"Current watermark: {last_seen}", flush=True)
     print(f"Calculated start page: {start_page}", flush=True)
 
     return start_page
@@ -249,6 +236,9 @@ def main():
     )
 
     inserted, skipped = insert_records_into_database(cleaned_records)
+
+    current_watermark = get_watermark()
+    update_watermark(current_watermark + inserted)
 
     print(
         f"Inserted {inserted} new records into PostgreSQL.",
