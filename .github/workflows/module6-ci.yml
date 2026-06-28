@@ -57,7 +57,7 @@ jobs:
       - name: Initialize database
         run: |
           cd module_6
-          python -m src.load_data
+          python -m src.db.load_data
 
       - name: Run pytest
         run: |
@@ -67,4 +67,4 @@ jobs:
       - name: Run pylint
         run: |
           cd module_6
-          pylint src consumer.py publisher.py --fail-under=10
+          pylint src/web src/worker src/db --fail-under=10
