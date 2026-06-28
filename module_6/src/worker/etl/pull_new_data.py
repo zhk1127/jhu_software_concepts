@@ -141,67 +141,72 @@ def insert_records_into_database(records):
     inserted = 0
     skipped = 0
 
-    for record in records:
-        raw_record = record.get("raw_record") or {}
-        p_id = raw_record.get("id")
+    try:
+        for record in records:
+            raw_record = record.get("raw_record") or {}
+            p_id = raw_record.get("id")
 
-        if p_id is None:
-            skipped += 1
-            continue
+            if p_id is None:
+                skipped += 1
+                continue
 
-        cur.execute(
-            """
-            INSERT INTO applicants (
-                p_id,
-                program,
-                comments,
-                url,
-                status,
-                term,
-                us_or_international,
-                degree,
-                gpa,
-                gre,
-                gre_v,
-                gre_aw,
-                date_added,
-                llm_generated_program,
-                llm_generated_university
+            cur.execute(
+                """
+                INSERT INTO applicants (
+                    p_id,
+                    program,
+                    comments,
+                    url,
+                    status,
+                    term,
+                    us_or_international,
+                    degree,
+                    gpa,
+                    gre,
+                    gre_v,
+                    gre_aw,
+                    date_added,
+                    llm_generated_program,
+                    llm_generated_university
+                )
+                VALUES (
+                    %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s
+                )
+                ON CONFLICT (p_id) DO NOTHING;
+                """,
+                (
+                    p_id,
+                    record.get("program"),
+                    record.get("comments"),
+                    record.get("url"),
+                    record.get("status"),
+                    record.get("term"),
+                    record.get("US/International"),
+                    record.get("Degree"),
+                    to_float(record.get("GPA")),
+                    to_int(record.get("GRE Score")),
+                    to_int(record.get("GRE V Score")),
+                    to_float(record.get("GRE AW")),
+                    record.get("date_added"),
+                    None,
+                    None,
+                ),
             )
-            VALUES (
-                %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s
-            )
-            ON CONFLICT (p_id) DO NOTHING;
-            """,
-            (
-                p_id,
-                record.get("program"),
-                record.get("comments"),
-                record.get("url"),
-                record.get("status"),
-                record.get("term"),
-                record.get("US/International"),
-                record.get("Degree"),
-                to_float(record.get("GPA")),
-                to_int(record.get("GRE Score")),
-                to_int(record.get("GRE V Score")),
-                to_float(record.get("GRE AW")),
-                record.get("date_added"),
-                None,
-                None,
-            ),
-        )
 
-        if cur.rowcount == 1:
-            inserted += 1
-        else:
-            skipped += 1
+            if cur.rowcount == 1:
+                inserted += 1
+            else:
+                skipped += 1
 
-    conn.commit()
-    cur.close()
-    conn.close()
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        cur.close()
+        conn.close()
 
     return inserted, skipped
 
